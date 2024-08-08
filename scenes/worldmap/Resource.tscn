@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://dmk0ili8cp7xd"]
+
+[ext_resource type="Script" path="res://REMAKE/scripts/worldmap/Resource.gd" id="1_3qckh"]
+
+[node name="StaticBody2D" type="StaticBody2D" node_paths=PackedStringArray("sprite", "shape")]
+script = ExtResource("1_3qckh")
+sprite = NodePath("AnimatedSprite2D")
+shape = NodePath("CollisionShape2D")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+animation = &""
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]

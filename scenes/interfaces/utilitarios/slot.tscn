@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://74sjqjswfnkc"]
+
+[node name="Slot" type="TextureRect"]
+custom_minimum_size = Vector2(32, 32)
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.8, 0.8, 0.8, 0.501961)
+
+[node name="Selected" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.6, 0.6, 0.6, 0.498039)
+
+[node name="OnHover" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.5, 0.5, 0.5, 0.498039)
+
+[node name="Item" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch_mode = 3

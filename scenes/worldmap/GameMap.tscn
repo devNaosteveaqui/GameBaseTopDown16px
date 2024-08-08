@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://b6qkhe5ja27i7"]
+
+[ext_resource type="PackedScene" uid="uid://b81svvtytywh6" path="res://REMAKE/scenes/worldmap/TileMap.tscn" id="1_05yku"]
+[ext_resource type="Script" path="res://REMAKE/scripts/worldmap/GameMap.gd" id="1_oral8"]
+
+[node name="GameMap" type="Node2D"]
+script = ExtResource("1_oral8")
+
+[node name="TileMap" parent="." instance=ExtResource("1_05yku")]
+layer_0/name = "Underfloor 2"
+layer_0/z_index = -2
+layer_2/name = "Floor"
+layer_2/z_index = 0
+layer_2/tile_data = PackedInt32Array(65535, 1, 0, 1, 1, 0)
+layer_4/y_sort_origin = 0
+layer_4/z_index = 2

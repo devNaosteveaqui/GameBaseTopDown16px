@@ -1,0 +1,53 @@
+[gd_resource type="TileSet" load_steps=13 format=3 uid="uid://dsbuivxljk264"]
+
+[ext_resource type="Texture2D" uid="uid://by7v5wnvu807t" path="res://REMAKE/resources/tiles/floor/sprites/floor_dirt.png" id="1_pvswk"]
+[ext_resource type="Texture2D" uid="uid://b31wilwdrd7eo" path="res://REMAKE/resources/tiles/floor/sprites/floor_grass.png" id="2_1e64j"]
+[ext_resource type="Texture2D" uid="uid://cfwmwsstjjtpa" path="res://REMAKE/resources/tiles/floor/sprites/grass_with_rock.png" id="3_k7g78"]
+[ext_resource type="Texture2D" uid="uid://bvt52cmgjb6fx" path="res://REMAKE/resources/tiles/floor/sprites/grass_details.png" id="4_qlilg"]
+[ext_resource type="Texture2D" uid="uid://s30gg3w1whir" path="res://REMAKE/resources/tiles/floor/sprites/grass_details_with_rock.png" id="5_nb8nb"]
+[ext_resource type="Texture2D" uid="uid://btsb23u1uu4h7" path="res://REMAKE/resources/tiles/floor/sprites/sand.png" id="6_7wkam"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ybjj1"]
+resource_name = "dirt"
+texture = ExtResource("1_pvswk")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vleiw"]
+resource_name = "grass"
+texture = ExtResource("2_1e64j")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 4
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_sbb6q"]
+resource_name = "grass 1"
+texture = ExtResource("3_k7g78")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7sco3"]
+resource_name = "grass 2"
+texture = ExtResource("4_qlilg")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s1ia1"]
+resource_name = "grass 3"
+texture = ExtResource("5_nb8nb")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_sfqhu"]
+resource_name = "sand"
+texture = ExtResource("6_7wkam")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[resource]
+sources/1 = SubResource("TileSetAtlasSource_ybjj1")
+sources/2 = SubResource("TileSetAtlasSource_vleiw")
+sources/6 = SubResource("TileSetAtlasSource_sfqhu")
+sources/3 = SubResource("TileSetAtlasSource_sbb6q")
+sources/4 = SubResource("TileSetAtlasSource_7sco3")
+sources/5 = SubResource("TileSetAtlasSource_s1ia1")
