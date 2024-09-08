@@ -1,42 +1,25 @@
-[gd_scene load_steps=3 format=3 uid="uid://b81svvtytywh6"]
+[gd_scene load_steps=5 format=3 uid="uid://b81svvtytywh6"]
 
-[ext_resource type="TileSet" uid="uid://dsbuivxljk264" path="res://REMAKE/resources/tiles/tileset.tres" id="1_k0167"]
-[ext_resource type="Script" path="res://REMAKE/scripts/worldmap/TileMap.gd" id="2_51213"]
+[ext_resource type="Script" path="res://scripts/worldmap/TileMap.gd" id="2_o02dt"]
+[ext_resource type="TileSet" uid="uid://pxmjbogv15be" path="res://resources/tiles/grass_tileset.tres" id="3_rveo8"]
+[ext_resource type="TileSet" uid="uid://mx7ma4dwewvd" path="res://resources/tiles/dirt_tileset.tres" id="4_d41ud"]
+[ext_resource type="TileSet" uid="uid://dbyqoadf4q3r3" path="res://resources/tiles/sand_tileset.tres" id="5_5jc2o"]
 
-[node name="TileMap" type="TileMap"]
+[node name="TileMap" type="Node2D" node_paths=PackedStringArray("world_map")]
 y_sort_enabled = true
-tile_set = ExtResource("1_k0167")
-format = 2
-layer_0/name = "Floor"
-layer_1/name = "Underfloor 1"
-layer_1/enabled = true
-layer_1/modulate = Color(1, 1, 1, 1)
-layer_1/y_sort_enabled = false
-layer_1/y_sort_origin = 0
-layer_1/z_index = -1
-layer_1/tile_data = PackedInt32Array()
-layer_2/name = "Underfloor 2"
-layer_2/enabled = true
-layer_2/modulate = Color(1, 1, 1, 1)
-layer_2/y_sort_enabled = false
-layer_2/y_sort_origin = 0
-layer_2/z_index = -2
-layer_2/tile_data = PackedInt32Array()
-layer_3/name = "Overfloor 1"
-layer_3/enabled = true
-layer_3/modulate = Color(1, 1, 1, 1)
-layer_3/y_sort_enabled = false
-layer_3/y_sort_origin = 0
-layer_3/z_index = 1
-layer_3/tile_data = PackedInt32Array()
-layer_4/name = "Overfloor 2"
-layer_4/enabled = true
-layer_4/modulate = Color(1, 1, 1, 1)
-layer_4/y_sort_enabled = false
-layer_4/y_sort_origin = 2
-layer_4/z_index = 0
-layer_4/tile_data = PackedInt32Array()
-script = ExtResource("2_51213")
+script = ExtResource("2_o02dt")
+world_map = [NodePath("Rocky Substrate"), NodePath("Underlying Soil"), NodePath("Topsoil"), NodePath("Floor")]
+
+[node name="Rocky Substrate" type="TileMapLayer" parent="."]
+
+[node name="Underlying Soil" type="TileMapLayer" parent="."]
+tile_set = ExtResource("5_5jc2o")
+
+[node name="Topsoil" type="TileMapLayer" parent="."]
+tile_set = ExtResource("4_d41ud")
+
+[node name="Floor" type="TileMapLayer" parent="."]
+tile_set = ExtResource("3_rveo8")
 
 [node name="Entities" type="Node2D" parent="."]
 y_sort_enabled = true

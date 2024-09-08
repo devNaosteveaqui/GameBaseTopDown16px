@@ -1,0 +1,23 @@
+[gd_resource type="SpriteFrames" load_steps=3 format=3 uid="uid://dojfm2kscmm4t"]
+
+[ext_resource type="Texture2D" uid="uid://be7s4gsc0nfll" path="res://resources/placeable/sprites/tree.png" id="1_eyuag"]
+[ext_resource type="Texture2D" uid="uid://bktaxpd32x6jk" path="res://resources/placeable/sprites/tree_stump.png" id="2_xb6pf"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_eyuag")
+}],
+"loop": true,
+"name": &"stage_0",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_xb6pf")
+}],
+"loop": true,
+"name": &"stage_1",
+"speed": 5.0
+}]

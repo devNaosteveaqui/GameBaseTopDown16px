@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dnf2avw10gt3r"
-path="res://.godot/imported/graveto_madeira.png-931c205e1fd176a7f66e68270d0049df.ctex"
+path="res://.godot/imported/graveto_madeira.png-d753f52e7ee3696089d850f86b35ee70.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/itens/graveto_madeira.png"
-dest_files=["res://.godot/imported/graveto_madeira.png-931c205e1fd176a7f66e68270d0049df.ctex"]
+source_file="res://resources/itens/graveto_madeira.png"
+dest_files=["res://.godot/imported/graveto_madeira.png-d753f52e7ee3696089d850f86b35ee70.ctex"]
 
 [params]
 

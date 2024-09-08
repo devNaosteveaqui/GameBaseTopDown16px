@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://dmk0ili8cp7xd"]
+
+[ext_resource type="Script" path="res://scripts/Placeable/Placeable.gd" id="1_py2i8"]
+
+[node name="Placeable" type="StaticBody2D" node_paths=PackedStringArray("sprite", "shape")]
+script = ExtResource("1_py2i8")
+sprite = NodePath("AnimatedSprite2D")
+shape = NodePath("CollisionShape2D")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+animation = &"stage_0"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="Timer" type="Timer" parent="."]

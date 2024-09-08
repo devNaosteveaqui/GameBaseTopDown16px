@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dte7qv38lut8y"
-path="res://.godot/imported/pseudohuman_walk2.png-3951457a8da1fd7f67a76c99a4ad55dc.ctex"
+path="res://.godot/imported/pseudohuman_walk2.png-ee17d7383ae5e0d334a9f3ffe3e57be3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/entities/human/sprites/pseudohuman_walk2.png"
-dest_files=["res://.godot/imported/pseudohuman_walk2.png-3951457a8da1fd7f67a76c99a4ad55dc.ctex"]
+source_file="res://resources/entities/human/sprites/pseudohuman_walk2.png"
+dest_files=["res://.godot/imported/pseudohuman_walk2.png-ee17d7383ae5e0d334a9f3ffe3e57be3.ctex"]
 
 [params]
 

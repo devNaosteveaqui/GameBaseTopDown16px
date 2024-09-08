@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b2w7f5it1cm35"
-path="res://.godot/imported/protetor_mao_madeira.png-980015a5764b7092a897da5569cc3e43.ctex"
+path="res://.godot/imported/protetor_mao_madeira.png-07eb9652a977887eef8e4304e597d051.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/itens/protetor_mao_madeira.png"
-dest_files=["res://.godot/imported/protetor_mao_madeira.png-980015a5764b7092a897da5569cc3e43.ctex"]
+source_file="res://resources/itens/protetor_mao_madeira.png"
+dest_files=["res://.godot/imported/protetor_mao_madeira.png-07eb9652a977887eef8e4304e597d051.ctex"]
 
 [params]
 

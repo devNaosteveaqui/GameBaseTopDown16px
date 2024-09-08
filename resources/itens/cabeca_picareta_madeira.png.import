@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cyn1h8d5pj8k3"
-path="res://.godot/imported/cabeca_picareta_madeira.png-3b06dd996aa3b0d4137f6461e9cdd7a7.ctex"
+path="res://.godot/imported/cabeca_picareta_madeira.png-80064593e7f6e99ee16ae734dda78781.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/itens/cabeca_picareta_madeira.png"
-dest_files=["res://.godot/imported/cabeca_picareta_madeira.png-3b06dd996aa3b0d4137f6461e9cdd7a7.ctex"]
+source_file="res://resources/itens/cabeca_picareta_madeira.png"
+dest_files=["res://.godot/imported/cabeca_picareta_madeira.png-80064593e7f6e99ee16ae734dda78781.ctex"]
 
 [params]
 

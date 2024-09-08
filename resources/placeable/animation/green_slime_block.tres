@@ -1,0 +1,14 @@
+[gd_resource type="SpriteFrames" load_steps=2 format=3 uid="uid://dbnjrhguuuqm6"]
+
+[ext_resource type="Texture2D" uid="uid://yv6daffajmj0" path="res://resources/placeable/sprites/green_slime_block_translucid.png" id="1_5643h"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_5643h")
+}],
+"loop": true,
+"name": &"stage_0",
+"speed": 12.0
+}]

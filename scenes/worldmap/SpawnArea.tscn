@@ -1,12 +1,12 @@
 [gd_scene load_steps=3 format=3 uid="uid://beybwxgv3661c"]
 
-[ext_resource type="Script" path="res://REMAKE/scripts/worldmap/SpawnArea.gd" id="1_54nms"]
+[ext_resource type="Script" path="res://scripts/worldmap/SpawnArea.gd" id="1_3vime"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ilmwe"]
 radius = 48.0
 
 [node name="SpawnArea" type="Node2D"]
-script = ExtResource("1_54nms")
+script = ExtResource("1_3vime")
 
 [node name="Area2D" type="Area2D" parent="."]
 collision_layer = 2

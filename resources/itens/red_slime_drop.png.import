@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://w75xju2dlrva"
-path="res://.godot/imported/red_slime_drop.png-cab24f301ce0dc5f236bc57701872151.ctex"
+path="res://.godot/imported/red_slime_drop.png-0f0ad6b2f6af60b1a6adb966835c7b52.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/itens/red_slime_drop.png"
-dest_files=["res://.godot/imported/red_slime_drop.png-cab24f301ce0dc5f236bc57701872151.ctex"]
+source_file="res://resources/itens/red_slime_drop.png"
+dest_files=["res://.godot/imported/red_slime_drop.png-0f0ad6b2f6af60b1a6adb966835c7b52.ctex"]
 
 [params]
 

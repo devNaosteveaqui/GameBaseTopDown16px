@@ -1,7 +1,13 @@
-[gd_scene format=3 uid="uid://74sjqjswfnkc"]
+[gd_scene load_steps=2 format=3 uid="uid://74sjqjswfnkc"]
 
-[node name="Slot" type="TextureRect"]
+[ext_resource type="Script" path="res://scripts/interfaces/utilitarios/slot.gd" id="1_udfr7"]
+
+[node name="Slot" type="TextureRect" node_paths=PackedStringArray("selectedShadow", "onHoveShadow", "item")]
 custom_minimum_size = Vector2(32, 32)
+script = ExtResource("1_udfr7")
+selectedShadow = NodePath("Selected")
+onHoveShadow = NodePath("OnHover")
+item = NodePath("Item")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1

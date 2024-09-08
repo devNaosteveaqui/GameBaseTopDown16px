@@ -1,16 +1,22 @@
 [gd_scene load_steps=3 format=3 uid="uid://cehqwav7clgk2"]
 
-[ext_resource type="Script" path="res://REMAKE/scripts/itens/Item.gd" id="1_hpeta"]
+[ext_resource type="Script" path="res://scripts/itens/Item.gd" id="1_oysa3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_euk7y"]
 radius = 8.0
 
-[node name="Item" type="Sprite2D"]
-script = ExtResource("1_hpeta")
+[node name="Item" type="Sprite2D" node_paths=PackedStringArray("timerCollect", "collisionArea")]
+script = ExtResource("1_oysa3")
+timerCollect = NodePath("Timer")
+collisionArea = NodePath("Area2D")
 
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_euk7y")
 
-[node name="Node2D" type="Node2D" parent="."]
+[node name="Timer" type="Timer" parent="."]
+
+[connection signal="tree_entered" from="." to="." method="_on_tree_entered"]
+[connection signal="tree_exited" from="." to="." method="_on_tree_exited"]
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

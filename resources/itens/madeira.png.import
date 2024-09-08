@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://n34lpvffhxa0"
-path="res://.godot/imported/madeira.png-031a0c67ce031261088779059ca7b0d5.ctex"
+path="res://.godot/imported/madeira.png-7b1cd5ca5d75779e5b14dc7bd6e7a7c6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/itens/madeira.png"
-dest_files=["res://.godot/imported/madeira.png-031a0c67ce031261088779059ca7b0d5.ctex"]
+source_file="res://resources/itens/madeira.png"
+dest_files=["res://.godot/imported/madeira.png-7b1cd5ca5d75779e5b14dc7bd6e7a7c6.ctex"]
 
 [params]
 

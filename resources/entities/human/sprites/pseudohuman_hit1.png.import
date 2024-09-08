@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bawnlsmillolu"
-path="res://.godot/imported/pseudohuman_hit1.png-03fd9025db2c94308e29bd5d53679d0c.ctex"
+path="res://.godot/imported/pseudohuman_hit1.png-81e8ad291951174d3767fb47e57e4d37.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/entities/human/sprites/pseudohuman_hit1.png"
-dest_files=["res://.godot/imported/pseudohuman_hit1.png-03fd9025db2c94308e29bd5d53679d0c.ctex"]
+source_file="res://resources/entities/human/sprites/pseudohuman_hit1.png"
+dest_files=["res://.godot/imported/pseudohuman_hit1.png-81e8ad291951174d3767fb47e57e4d37.ctex"]
 
 [params]
 

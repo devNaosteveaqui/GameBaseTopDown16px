@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://by7v5wnvu807t"
-path="res://.godot/imported/floor_dirt.png-127d5469273a8eae850c5c519563b161.ctex"
+path="res://.godot/imported/floor_dirt.png-1846f1343d2debc5c83961a8e0f24172.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/tiles/floor/sprites/floor_dirt.png"
-dest_files=["res://.godot/imported/floor_dirt.png-127d5469273a8eae850c5c519563b161.ctex"]
+source_file="res://resources/tiles/floor/sprites/floor_dirt.png"
+dest_files=["res://.godot/imported/floor_dirt.png-1846f1343d2debc5c83961a8e0f24172.ctex"]
 
 [params]
 

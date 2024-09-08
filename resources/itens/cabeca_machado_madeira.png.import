@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://3s8xqllqgfu1"
-path="res://.godot/imported/cabeca_machado_madeira.png-5b26bbfaaa1b58e2c9c76e91aa79f74c.ctex"
+path="res://.godot/imported/cabeca_machado_madeira.png-7af420cbef7f7f6a182ed8c5dc1b523c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/itens/cabeca_machado_madeira.png"
-dest_files=["res://.godot/imported/cabeca_machado_madeira.png-5b26bbfaaa1b58e2c9c76e91aa79f74c.ctex"]
+source_file="res://resources/itens/cabeca_machado_madeira.png"
+dest_files=["res://.godot/imported/cabeca_machado_madeira.png-7af420cbef7f7f6a182ed8c5dc1b523c.ctex"]
 
 [params]
 

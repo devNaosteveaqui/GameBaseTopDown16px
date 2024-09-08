@@ -2,6 +2,8 @@ extends CharacterBody2D
 
 class_name Entity
 
+signal deathCharacter
+
 @export var sprite : AnimatedSprite2D
 @export var raycast : RayCast2D
 @export var lifebar : ColorRect
@@ -9,35 +11,47 @@ class_name Entity
 
 var direction_angle = 0
 var range_action = 24
-
 var inMoviment = 0
 var hitted = false
 var hitting = false
-
-var status = [20,5,5,0]
-var statusMax = [20,5,5,100]
-var natural_regen = [1,1,1,0]
 var regen_ativated = true
 
+var status : Status
+var type
+
+
 static func create_entity(race):
-	var e = load("res://REMAKE/scenes/entities/Entity.tscn").instantiate()
+	var e : Entity= load("res://scenes/entities/Entity.tscn").instantiate()
+	e.inventory.createInventory()
 	e.setRace(race)
+	var drops = RDrop.findRelation(race)
+	if drops != null:
+		for d in drops:
+			var item : Item = Item.createItem(d[1])
+			item.setQuantity(d[0])
+			e.inventory.store_item(item)
+	e.initStatus()
 	return e
+
+func initStatus():
+	status = Status.createStatus(inventory,type)
+	status.connect("lifeIsZero",death)
+	status.connect("lifeLoss",hit)
+	status.connect("lifeChange",updateLifebar)
+	status.connect("lifeIsFull",stopRegen)
 
 func setRace(race):
 	setAnimation(race.animation)
+	type = race
 
 func setAnimation(animation):
-	sprite.sprite_frames = load("res://REMAKE/resources/entities/"+animation)
+	sprite.sprite_frames = load("res://resources/entities/"+animation)
 	sprite.play("default")
 
 func _ready():
 	raycast.target_position = Vector2(0,range_action)
-	$Timer.start(5)
-	$Timer.connect("timeout",updateEntity)
 
 func _process(delta):
-	updateDirection()
 	updateVelocity()
 	updateAnimation()
 	move_and_slide()
@@ -57,22 +71,18 @@ func updateAnimation():
 	else:
 		sprite.play("default")
 
-func updateDirection():
-	var direction = raycast.target_position
-	raycast.target_position = direction.rotated(deg_to_rad(direction_angle))
-
 func updateLifebar():
-	lifebar.size.x = 20.0*(status[0]/statusMax[0])
+	lifebar.size.x = 20.0*(status.getLifeState())
 
-func naturalRegen():
-	gainStatus(0,natural_regen[0])
-	gainStatus(1,natural_regen[1])
-	gainStatus(2,natural_regen[2])
-	gainStatus(3,natural_regen[3])
+func stopRegen():
+	if $Timer.time_left > 0:
+		$Timer.stop()
 
 func updateEntity():
 	if regen_ativated:
-		naturalRegen()
+		if $Timer.time_left == 0:
+			$Timer.start(10)
+			$Timer.connect("timeout",status.activeRegen)
 
 func _on_animation_looped():
 	if sprite.animation == "hitted":
@@ -85,48 +95,115 @@ func _on_animation_looped():
 func hit():
 	hitted = true
 	inMoviment = 0
+	updateEntity()
 
 # FUNCTIONS ON ACTION
-
-func lossStatus(sts,value):
-	if status[sts] - value < 0:
-		status[sts] = 0
-	else:
-		status[sts] -= value
-	updateLifebar()
-	hit()
-
-func gainStatus(sts,value):
-	if status[sts] + value > statusMax[sts]:
-		status[sts] = statusMax[sts]
-	else:
-		status[sts] += value
-	updateLifebar()
-	hit()
 
 func walk_to(target:Vector2):
 	if target.is_equal_approx(Vector2.ZERO):
 		inMoviment = 0
 	else:
 		inMoviment = 1
-	look_to(target*range_action)
+		look_to(target*range_action)
+
+func look_to(target : Vector2):
+	raycast.target_position = target
+
+func collect(item):
+	var isStoraged = inventory.store_item(item)
+	if !isStoraged:
+		drop(item)
+
+func drop(item):
+	item.dropOnGround(position)
+	get_parent().add_child(item)
+
+func dropAll(itens):
+	for i in itens.size():
+		if itens[i] != null:
+			drop(itens[i])
+
+# ENTITY ACTIONS
 
 func active_action():
 	hitting = true
 	inMoviment = 0
 
-func look_to(target : Vector2):
-	direction_angle = get_angle_to(target)
+func useItem(onSelf:bool):
+	var target = raycast.get_collider()
+	if onSelf:
+		target = self
+	if !onSelf && target == null:
+		inventory.placeItemOnWorld(get_parent())
+	if target != null :
+		if target is Entity || target is Placeable:
+			makeActionOn(target)
 
-func collect(item):
-	var isFull = inventory.store_item(item)
-	if isFull:
-		drop(item)
+func makeActionOn(target):
+	status.consumStatus()
+	var weapon = inventory.getPrincipalItem()
+	
+	if weapon == null:
+		if target.hasDefense():
+			tryApplyEffect([-1,0,0,0])
+		else:
+			target.tryApplyEffect(status.getEffect())
+	else:
+		if target.hasDefense():
+			if target.testHardnessItem(weapon):
+				weapon.useOn(target,status.getEffect())
+		else:
+			weapon.useOn(target,status.getEffect())
 
-func drop(item):
-	item.position = position + raycast.target_position
-	get_parent().add_child(item)
+func tryApplyEffectOnArmor(effect):
+	inventory.damageArmor(effect,Inventory.TORSO)
 
-func dropAll(itens):
-	for i in itens.size():
-		drop(itens[i])
+func testHardnessItem(item):
+	var effectPassed = false
+	var itemHardness = RUseable.findRelation(item.type).on_item
+	var amorPieces = inventory.getHardenessAmorPieces()
+	
+	for piece in amorPieces.size():
+		var rdif = piece - itemHardness
+		if rdif >= 5:
+			item.tryApplyEffect([-1 + (-1)*(rdif/2),0,0,0])
+		elif rdif >= 0:
+			effectPassed = true
+			item.tryApplyEffect([-1,0,0,0])
+			inventory.damageArmor([-1,0,0,0],piece)
+		else:
+			effectPassed = true
+			inventory.damageArmor([-1 + (rdif/2),0,0,0],piece)
+	return effectPassed
+
+func tryApplyEffect(effect):
+	status.applyEffect(effect)
+
+func hasDefense():
+	return inventory.getArmorDefense().size() > 0
+
+func interact():
+	var interactable = raycast.get_collider()
+	if interactable.has_method("try_interact"):
+		interactable.try_interact()
+
+func try_interact():
+	print("Interagindo")
+
+func callSkill():
+	#chama a skill da lista do conhecimento
+	pass
+
+func openInterface():
+	var struct = raycast.get_collider()
+	if struct != null:
+		pass
+
+func getPositionOnEye():
+	return position + raycast.target_position
+
+func death():
+	dropAll(inventory.inventory)
+	dropAll(inventory.equiped)
+	emit_signal("deathCharacter")
+	queue_free()

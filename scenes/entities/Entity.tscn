@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://crocrls325nj0"]
 
-[ext_resource type="Script" path="res://REMAKE/scripts/entities/Entity.gd" id="1_kgwfv"]
-[ext_resource type="Script" path="res://REMAKE/scripts/entities/Inventory.gd" id="2_oialc"]
+[ext_resource type="Script" path="res://scripts/entities/Entity.gd" id="1_dychw"]
+[ext_resource type="Script" path="res://scripts/entities/Inventory.gd" id="2_1aski"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o477l"]
 radius = 8.0
@@ -10,10 +10,7 @@ radius = 8.0
 radius = 32.0
 
 [node name="Entity" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "raycast", "lifebar", "inventory")]
-floor_stop_on_slope = false
-floor_constant_speed = true
-floor_max_angle = 0.0
-script = ExtResource("1_kgwfv")
+script = ExtResource("1_dychw")
 sprite = NodePath("AnimationNode")
 raycast = NodePath("RayCast2D")
 lifebar = NodePath("Node2D/LifeBar/ColorRect/ColorRect2")
@@ -72,6 +69,6 @@ grow_vertical = 2
 color = Color(0, 0.823529, 0, 1)
 
 [node name="Inventory" type="Node" parent="."]
-script = ExtResource("2_oialc")
+script = ExtResource("2_1aski")
 
 [connection signal="animation_looped" from="AnimationNode" to="." method="_on_animation_looped"]

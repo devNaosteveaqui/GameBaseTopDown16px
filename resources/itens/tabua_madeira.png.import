@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ws7515qx117w"
-path="res://.godot/imported/tabua_madeira.png-084808630d692f3719186ef4c47a2199.ctex"
+path="res://.godot/imported/tabua_madeira.png-a9881034d4cdf0ba57ab3b2c31a2711d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/itens/tabua_madeira.png"
-dest_files=["res://.godot/imported/tabua_madeira.png-084808630d692f3719186ef4c47a2199.ctex"]
+source_file="res://resources/itens/tabua_madeira.png"
+dest_files=["res://.godot/imported/tabua_madeira.png-a9881034d4cdf0ba57ab3b2c31a2711d.ctex"]
 
 [params]
 

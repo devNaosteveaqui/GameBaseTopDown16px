@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://sa8bvshikgrd"
-path="res://.godot/imported/pedra.png-ec3cc9295b006e96a3fc7f789a095907.ctex"
+path="res://.godot/imported/pedra.png-fcdeb96b5f245f8b9652e2bf3ba71b86.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/itens/pedra.png"
-dest_files=["res://.godot/imported/pedra.png-ec3cc9295b006e96a3fc7f789a095907.ctex"]
+source_file="res://resources/itens/pedra.png"
+dest_files=["res://.godot/imported/pedra.png-fcdeb96b5f245f8b9652e2bf3ba71b86.ctex"]
 
 [params]
 

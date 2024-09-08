@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://btsb23u1uu4h7"
-path="res://.godot/imported/sand.png-1171129944361bb19081503101679ef6.ctex"
+path="res://.godot/imported/sand.png-05a97505746b94d0acbf7004de81fb00.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://REMAKE/resources/tiles/floor/sprites/sand.png"
-dest_files=["res://.godot/imported/sand.png-1171129944361bb19081503101679ef6.ctex"]
+source_file="res://resources/tiles/floor/sprites/sand.png"
+dest_files=["res://.godot/imported/sand.png-05a97505746b94d0acbf7004de81fb00.ctex"]
 
 [params]
 
