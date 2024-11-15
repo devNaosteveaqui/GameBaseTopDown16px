@@ -12,7 +12,7 @@ var type
 var consumable : bool = false
 var canContainItem : bool = false
 var defensiveable : bool = false
-
+var wieldable : bool = false
 var stackable : bool = true
 var collectable : bool = false
 
@@ -25,7 +25,7 @@ var placeableRel : Dictionary
 var storaged : int  = 1
 var lastEntityCollect
 var nome : String
-
+var estatistica_class : String
 var isBouncing : bool = false
 var posSpawn : Vector2
 var velocity_y = -300
@@ -36,14 +36,15 @@ var gravity_x = 1
 static func createItem(itemType):
 	var item = load("res://scenes/itens/Item.tscn").instantiate()
 	item.nome = itemType.nome
-	item.setType(itemType)
-	item.setSprite(itemType.sprite)
-	item.setSlotEquipable(itemType.equipable)
-	
-	item.setPlaceable(RPlaceable.findRelation(itemType))
-	item.setConsumable(itemType.consumable)
-	item.setInventorySlot(itemType.inventory_slots)
-	item.setDefensiveable(itemType.defensiveable)
+	item.estatistica_class = itemType.statistic_class
+	item.set_type(itemType)
+	item.set_sprite(itemType.sprite)
+	item.set_slot_equipable(itemType.equipable)
+	item.set_wieldable(itemType.wieldable)
+	item.set_placeable(RPlaceable.findRelation(itemType))
+	item.set_consumable(itemType.consumable)
+	item.set_inventory_slot(itemType.inventory_slots)
+	item.set_defensiveable(itemType.defensiveable)
 	item.initStatus()
 	#item.setCanContainItem(itemType.canContainItem)
 	return item
@@ -52,45 +53,47 @@ func initStatus():
 	status = Status.createStatus(inventory,type)
 	status.connect("lifeIsZero",itemBreak)
 	
+func set_wieldable(flag):
+	wieldable = flag
 
-func setDefensiveable(flag):
+func set_defensiveable(flag):
 	defensiveable = flag
 
-func setInventorySlot(qtd):
+func set_inventory_slot(qtd):
 	inventory.resize(qtd)
 
-func setPlaceable(r):
+func set_placeable(r):
 	if r != null:
 		placeableRel = r
 
-func setCanContainItem(flag):
+func set_can_contain_item(flag):
 	canContainItem = flag
 
-func setConsumable(flag):
+func set_consumable(flag):
 	consumable = flag
 
-func setStackable(flag):
+func set_stackable(flag):
 	stackable = flag
 
-func setCollectable(flag):
+func set_collectable(flag):
 	collectable = flag
 
-func setDrops(itemdrop):
+func set_drops(itemdrop):
 	if itemdrop != null:
 		for idx in itemdrop.size():
 			var drop : Item = Item.createItem(itemdrop[idx][1])
-			drop.setQuantity(itemdrop[idx][0])
+			drop.set_quantity(itemdrop[idx][0])
 			for slot in inventory.size():
 				if inventory[slot] == null:
 					inventory[slot] = drop
 
-func setSlotEquipable(slot):
+func set_slot_equipable(slot):
 	slotEquipable = slot
 
-func setSprite(sprite):
+func set_sprite(sprite):
 	texture = load("res://resources/itens/" + sprite)
 
-func setType(itemType):
+func set_type(itemType):
 	type = itemType
 
 func canStack(item):
@@ -105,24 +108,27 @@ func is_sameType(item):
 func is_defensive():
 	return defensiveable
 
-func setQuantity(qtd):
+func set_quantity(qtd):
 	storaged = qtd
-	updateName()
+	update_name()
 
 func accumulate(qtd = 1):
 	storaged += qtd
-	updateName()
+	update_name()
 
 func decumulate(qtd = 1):
 	storaged -= qtd
-	updateName()
+	update_name()
 	return Item.createItem(type)
 
-func updateName():
+func update_name():
 	self.nome = type.nome + " ( x" +str(storaged)+ " )"
 
 func hasAtLastQuantity(qtd:int):
 	return qtd <= storaged
+
+func isWieldable():
+	return wieldable
 
 func isStorageZero():
 	return storaged == 0
@@ -131,29 +137,28 @@ func _on_area_2d_body_entered(body):
 	if body is CharacterBody2D:
 		if body.has_method("collect"):
 			if collectable:
-				collectable = false
+				set_collectable(false)
 				beCollected(body)
 
 func beCollected(body):
 	
 	var parent = get_parent()
 	if parent != null:
-		parent.remove_child(self)
+		parent.call_deferred("remove_child",self)
+		#parent.remove_child(self)
 	body.collect(self)
 	lastEntityCollect = body
 
 func hasMoreHardness(value,onWhat):
 	return RUseable.findRelation(type)[onWhat] > value
 
-func tryApplyEffect(effect):
-	status.applyEffect(effect)
+func try_apply_effect(effect):
+	status.applyEffect({},effect)
 
-func useOn(target,statsEffect:Array = [0,0,0,0]):
-	var effectFinal = status.getEffect()
-	for sts in effectFinal.size():
-		effectFinal[sts] += statsEffect[sts]
-	target.tryApplyEffect(effectFinal)
-	
+func useOn(statistic,target,statsEffect:Array = [0,0,0,0]):
+	var effectFinal = get_effect_final(statsEffect)
+	SystemBattle.apply_effect_on(statistic,effectFinal,target)
+	#target.try_apply_effect(statistic,effectFinal)
 	if consumable:
 		itemBreak()
 
@@ -163,23 +168,32 @@ func itemBreak():
 		emit_signal("ranout",self)
 
 func dropContent():
-	setDrops(RDrop.findRelation(type))
+	set_drops(RDrop.findRelation(type))
 	return inventory
 
+func get_effect_final(statsEffect:Array):
+	var effectFinal = status.get_effect()
+	for sts in effectFinal.size():
+		effectFinal[sts] += statsEffect[sts]
+	return effectFinal
 
-func getPlaceable():
+func get_placeable():
 	return Placeable.createPlaceable(placeableRel)
 
-func getItemNome():
+func get_item_nome():
 	return nome
 
-func getQuantity():
+func get_quantity():
 	return storaged
 
-func getConsumStatus():
-	return status.getConsumStatus()
+func get_consum_status():
+	return status.get_consum_status()
 
+func get_status_effect():
+	return status.get_effect()
 
+func get_class_statistic():
+	return estatistica_class
 
 func dropOnGround(posSpawn):
 	self.posSpawn = posSpawn
@@ -205,4 +219,4 @@ func _physics_process(delta):
 			velocity_y = -velocity_y*0.6
 			if abs(velocity_y) < 50:
 				isBouncing = false
-				collectable = true
+				set_collectable(true)

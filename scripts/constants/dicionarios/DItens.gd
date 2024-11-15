@@ -7,6 +7,8 @@ const TRONCO = {
 	'desc':"Bom, todo item de madeira precisa vir de algum lugar, por exemplo... um tronco de árvore talvez?",
 	'sprite' : 'madeira.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "recurso natural vegetal",
+	'wieldable' : false,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
@@ -20,12 +22,14 @@ const PEDRA = {
 	'desc':"Já viu uma Pedra?",
 	'sprite' : 'pedra.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "recurso natural mineral",
+	'wieldable' : false,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [0,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
 }
 const FRUTA_VERMELHA = {
@@ -33,12 +37,14 @@ const FRUTA_VERMELHA = {
 	'desc':"Uma fruta estranha, não é morango e nem maçã mas é vermelha e estranhamente restaura sua vida?",
 	'sprite' : 'frutinha_vermelha.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "recurso natural comestivel",
+	'wieldable' : false,
 	'consumable' : true,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [2,1,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [2,1,0,0],
 	'inventory_slots' : 0
 }
 const GOSMA_SLIME_VERMELHO = {
@@ -46,12 +52,14 @@ const GOSMA_SLIME_VERMELHO = {
 	'desc':"... sem comentários é uma gosma vermelha e apenas isso.",
 	'sprite' : 'red_slime_drop.png',
 	'equipable' : [],
+	'statistic_class' : "fluido de monstro",
+	'wieldable' : false,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [0,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
 }
 const GOSMA_SLIME_VERDE = {
@@ -59,12 +67,14 @@ const GOSMA_SLIME_VERDE = {
 	'desc':"... sem comentários é uma gosma verde e apenas isso.",
 	'sprite' : 'green_slime_drop.png',
 	'equipable' : [],
+	'statistic_class' : "fluido de monstro",
+	'wieldable' : false,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [0,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
 }
 const TABUA = {
@@ -72,12 +82,14 @@ const TABUA = {
 	'desc':"Ótimo para quem quer construir algo, um baú ou uma casa. Mas acredito que há histórias que dizem não ser um bom material para casas, um lobo poderia derruba-la com apenas um sopro.",
 	'sprite' : 'tabua_madeira.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "recurso processado",
+	'wieldable' : false,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [0,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
 }
 const PROTETOR_DE_MAO = {
@@ -85,12 +97,14 @@ const PROTETOR_DE_MAO = {
 	'desc':"Usado para criar uma Espada de Madeira, protengendo os frágeis dedos do guerreiro.",
 	'sprite' : 'protetor_mao_madeira.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "parte de item",
+	'wieldable' : false,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [0,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
 }
 const GRAVETO = {
@@ -98,12 +112,14 @@ const GRAVETO = {
 	'desc':"Um frágil graveto que pode ser usado para criar itens simples, talvez com sorte de para usar como uma varinha maǵica.",
 	'sprite' : 'graveto_madeira.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "manejavel",
+	'wieldable' : true,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [0,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
 }
 const ESPADA_MADEIRA = {
@@ -111,12 +127,14 @@ const ESPADA_MADEIRA = {
 	'desc':"Uma arma branca usada para treinos, ou por crianças para brincarem... brincadeiras saudaveis.",
 	'sprite' : 'espada.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "manejavel",
+	'wieldable' : true,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [-1,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [-1,0,0,0],
 	'inventory_slots' : 0
 }
 const CABO_MADEIRA = {
@@ -124,12 +142,14 @@ const CABO_MADEIRA = {
 	'desc':"Um cabo feito de madeira bastante utilizado para criar espadas juntamento com um Protetor de Mão. Ou sendo usado como um bom porrete, a escolha é sua.",
 	'sprite' : 'cabo_madeira.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "manejavel",
+	'wieldable' : true,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [-1,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [-1,0,0,0],
 	'inventory_slots' : 0
 }
 const MACHADO_MADEIRA = {
@@ -137,12 +157,14 @@ const MACHADO_MADEIRA = {
 	'desc':"Ferramenta usada para coletar mais madeira... quem foi que inventou isso? Sério? De madeira?",
 	'sprite' : 'machado.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "manejavel",
+	'wieldable' : true,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [-1,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [-1,0,0,0],
 	'inventory_slots' : 0
 }
 const CABECA_MACHADO_MADEIRA = {
@@ -150,12 +172,14 @@ const CABECA_MACHADO_MADEIRA = {
 	'desc':" 'Lâmina' para criar o seu machado de madeira...  '¬¬",
 	'sprite' : 'cabeca_machado_madeira.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "parte de item",
+	'wieldable' : false,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [0,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
 }
 const BLOCK_GREENSLIME = {
@@ -163,11 +187,13 @@ const BLOCK_GREENSLIME = {
 	'desc':" 'Por que não fazer um bloco com a gosma do slime?",
 	'sprite' : 'green_slime_block_translucid.png',
 	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "bloco",
+	'wieldable' : false,
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'status' : [10,0,0,0],
-	'status_max' : [10,0,0,0],
-	'effect' : [0,0,0,0],
+	'born_status' : [10,0,0,0],
+	'born_sstatus_max' : [10,0,0,0],
+	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
 }

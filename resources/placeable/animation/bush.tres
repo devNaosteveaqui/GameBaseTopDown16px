@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=3 format=3]
+[gd_resource type="SpriteFrames" load_steps=3 format=3 uid="uid://c7yuaf6pl5i8j"]
 
 [ext_resource type="Texture2D" uid="uid://eyp7ai7r1ccv" path="res://resources/placeable/sprites/bush_ready.png" id="1_2uum8"]
 [ext_resource type="Texture2D" uid="uid://b8gqlng76q6w4" path="res://resources/placeable/sprites/bush.png" id="2_xmsmr"]
@@ -11,7 +11,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"default",
-"speed": 5.0
+"speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -19,5 +19,5 @@ animations = [{
 }],
 "loop": true,
 "name": &"harvested",
-"speed": 5.0
+"speed": 12.0
 }]

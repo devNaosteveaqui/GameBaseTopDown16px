@@ -1,9 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://box05syemx16a"]
+[gd_scene load_steps=9 format=3 uid="uid://box05syemx16a"]
 
 [ext_resource type="PackedScene" uid="uid://74sjqjswfnkc" path="res://scenes/interfaces/utilitarios/slot.tscn" id="1_ct4hl"]
 [ext_resource type="Script" path="res://scripts/interfaces/Inventario.gd" id="1_fop3a"]
 [ext_resource type="Texture2D" uid="uid://b7at5g4loqo56" path="res://resources/interface/closeButtonNormal.png" id="3_8twgk"]
+[ext_resource type="Texture2D" uid="uid://cx32oq6dq1iqv" path="res://resources/interface/craftButtonNormal.png" id="3_d8io1"]
 [ext_resource type="Texture2D" uid="uid://cfhjt43dqndtm" path="res://resources/interface/closeButtonPressed.png" id="4_4o5nb"]
+[ext_resource type="Texture2D" uid="uid://bdftmfbqnxtv5" path="res://resources/interface/craftButtonPressed.png" id="4_miyvh"]
+[ext_resource type="Texture2D" uid="uid://bcf4ctrr6s4lc" path="res://resources/interface/craftButtonHover.png" id="5_011ne"]
 [ext_resource type="Texture2D" uid="uid://coi0w1486capc" path="res://resources/interface/closeButtonHover.png" id="5_mp3ie"]
 
 [node name="Inventario" type="Control" node_paths=PackedStringArray("gridInventory", "gridEquipamentos", "craft", "buttonWorkStation", "itemInfo")]
@@ -246,6 +249,7 @@ clip_text = true
 fit_to_longest_item = false
 
 [node name="CraftAction" type="TextureButton" parent="Control/Content/WorkArea/WorkStationControl/Craft"]
+texture_filter = 1
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 1
 anchors_preset = 7
@@ -258,6 +262,10 @@ offset_top = -32.0
 offset_right = 16.0
 grow_horizontal = 2
 grow_vertical = 0
+texture_normal = ExtResource("3_d8io1")
+texture_pressed = ExtResource("4_miyvh")
+texture_hover = ExtResource("5_011ne")
+stretch_mode = 5
 
 [node name="Equipamentos" type="ItemList" parent="Control/Content/WorkArea/WorkStationControl"]
 visible = false

@@ -2,10 +2,10 @@
 
 [ext_resource type="Texture2D" uid="uid://by7v5wnvu807t" path="res://resources/tiles/floor/sprites/floor_dirt.png" id="1_pvswk"]
 [ext_resource type="Texture2D" uid="uid://b31wilwdrd7eo" path="res://resources/tiles/floor/sprites/floor_grass.png" id="2_1e64j"]
-[ext_resource type="Texture2D" uid="uid://cfwmwsstjjtpa" path="res://resources/tiles/floor/sprites/grass_with_rock.png" id="3_k7g78"]
-[ext_resource type="Texture2D" uid="uid://bvt52cmgjb6fx" path="res://resources/tiles/floor/sprites/grass_details.png" id="4_qlilg"]
-[ext_resource type="Texture2D" uid="uid://s30gg3w1whir" path="res://resources/tiles/floor/sprites/grass_details_with_rock.png" id="5_nb8nb"]
-[ext_resource type="Texture2D" uid="uid://btsb23u1uu4h7" path="res://resources/tiles/floor/sprites/sand.png" id="6_7wkam"]
+[ext_resource type="Texture2D" uid="uid://cfwmwsstjjtpa" path="res://resources/tiles/floor/sprites/floor_grass_with_rock.png" id="3_k7g78"]
+[ext_resource type="Texture2D" uid="uid://bvt52cmgjb6fx" path="res://resources/tiles/floor/sprites/floor_grass_with_small_grass_details.png" id="4_qlilg"]
+[ext_resource type="Texture2D" uid="uid://s30gg3w1whir" path="res://resources/tiles/floor/sprites/floor_grass_with_rock_and_small_grass_detail.png" id="5_nb8nb"]
+[ext_resource type="Texture2D" uid="uid://btsb23u1uu4h7" path="res://resources/tiles/floor/sprites/floor_sand.png" id="6_7wkam"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ybjj1"]
 resource_name = "dirt"

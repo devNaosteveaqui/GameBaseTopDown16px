@@ -1,12 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://b81svvtytywh6"]
+[gd_scene load_steps=7 format=3 uid="uid://b81svvtytywh6"]
 
 [ext_resource type="Script" path="res://scripts/worldmap/TileMap.gd" id="2_o02dt"]
 [ext_resource type="TileSet" uid="uid://pxmjbogv15be" path="res://resources/tiles/grass_tileset.tres" id="3_rveo8"]
 [ext_resource type="TileSet" uid="uid://mx7ma4dwewvd" path="res://resources/tiles/dirt_tileset.tres" id="4_d41ud"]
 [ext_resource type="TileSet" uid="uid://dbyqoadf4q3r3" path="res://resources/tiles/sand_tileset.tres" id="5_5jc2o"]
+[ext_resource type="Script" path="res://scripts/worldmap/ChunkVisibilityNotfier2D.gd" id="5_elhee"]
+[ext_resource type="Script" path="res://scripts/worldmap/dinamics_objects.gd" id="5_enjmb"]
 
 [node name="TileMap" type="Node2D" node_paths=PackedStringArray("world_map")]
-y_sort_enabled = true
 script = ExtResource("2_o02dt")
 world_map = [NodePath("Rocky Substrate"), NodePath("Underlying Soil"), NodePath("Topsoil"), NodePath("Floor")]
 
@@ -21,5 +22,14 @@ tile_set = ExtResource("4_d41ud")
 [node name="Floor" type="TileMapLayer" parent="."]
 tile_set = ExtResource("3_rveo8")
 
-[node name="Entities" type="Node2D" parent="."]
+[node name="DinamicsObjects" type="Node2D" parent="." node_paths=PackedStringArray("chunks_manager")]
 y_sort_enabled = true
+script = ExtResource("5_enjmb")
+chunks_manager = NodePath("../ChunkVisibilityNotfier2D")
+
+[node name="ChunkVisibilityNotfier2D" type="Node2D" parent="."]
+script = ExtResource("5_elhee")
+TILE_SIZE = Vector2i(32, 32)
+CHUNK_SIZE_IN_TILES = Vector2i(16, 16)
+NOTIFIER_SIZE_IN_CHUNKS = Vector2i(2, 2)
+ENABLER_SIZE_IN_NOTIFIER = Vector2i(2, 2)

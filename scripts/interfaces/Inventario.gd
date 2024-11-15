@@ -20,20 +20,35 @@ func showInventory(inventory):
 func showItensOnInvetory(itens:Array):
 	for slot in itens.size():
 		if itens[slot] != null:
-			gridInventory.add_item(itens[slot].getItemNome(),itens[slot].texture)
+			gridInventory.add_item(itens[slot].get_item_nome(),itens[slot].texture)
 		else:
 			gridInventory.add_item("vazio")
 
 func showItensEquiped(itens:Array):
 	for slot in itens.size():
 		if itens[slot] != null:
-			gridEquipamentos.add_item(itens[slot].getItemNome(),itens[slot].texture)
+			gridEquipamentos.add_item(itens[slot].get_item_nome(),itens[slot].texture)
 		else:
-			gridEquipamentos.add_item("vazio")
+			#gridEquipamentos.add_item("vazio")
+			var texture : String = "res://resources/interface/"
+			match slot:
+				Inventory.HEAD:
+					texture = texture + "head_slot_symbol.png"
+				Inventory.TORSO:
+					texture = texture + "chest_slot_symbol.png"
+				Inventory.PERNAS:
+					texture = texture + "leg_slot_symbol.png"
+				Inventory.PES:
+					texture = texture + "foot_slot_symbol.png"
+				Inventory.HAND_L,Inventory.HAND_R:
+					texture = texture + "hold_slot_symbol.png"
+				_:
+					texture = texture + "finger_slot_symbol.png"
+			gridEquipamentos.add_item("vazio",load(texture))
 
 func showCraftItens():
 	for idx in RCraft.RELATIONS.size():
-		var recipe = RCraft.getRecipeResult(idx)
+		var recipe = RCraft.get_recipe_result(idx)
 		craft.get_node("Result").add_item(recipe[recipe.keys()[0]].nome)
 		craft.get_node("Result").select(-1)
 
@@ -43,7 +58,7 @@ func _on_inventory_item_activated(index):
 
 func _on_inventory_item_clicked(index, at_position, mouse_button_index):
 	if mouse_button_index == 1:
-		showItemInfo(player.getItemInventoryInfo(index))
+		showItemInfo(player.get_item_inventory_info(index))
 	elif mouse_button_index == 2:
 		player.dropItemStoraged(index)
 
@@ -52,7 +67,7 @@ func _on_equipamentos_item_activated(index):
 
 func _on_equipamentos_item_clicked(index, at_position, mouse_button_index):
 	if mouse_button_index == 1:
-		showItemInfo(player.getItemEquipedInfo(index))
+		showItemInfo(player.get_item_equiped_info(index))
 	elif mouse_button_index == 2:
 		player.dropItemEquiped(index)
 
@@ -60,30 +75,30 @@ func _on_equipamentos_item_clicked(index, at_position, mouse_button_index):
 func _on_craft_action_button_down():
 	var craftId = craft.get_node("Result").get_selected_id()
 	if craftId > -1 && canCraft:
-		var recipe = RCraft.getRecipeResult(craftId)
+		var recipe = RCraft.get_recipe_result(craftId)
 		var recipeKey = recipe.keys()[0]
 		var item_type = recipe[recipeKey]
 		var itemCrafted = Item.createItem(item_type)
-		itemCrafted.setQuantity(int(recipeKey.rsplit("x",true,1)[1]))
-		if player.store_item(itemCrafted):
+		itemCrafted.set_quantity(int(recipeKey.rsplit("x",true,1)[1]))
+		if player.store_item(itemCrafted,Estatisticas.ITENS.CRAFTADOS):
 			canCraft = false
 			nCrafts -= 1
-			var materials = RCraft.getRecipeMaterials(craftId)
+			var materials = RCraft.get_recipe_materials(craftId)
 			for idx in materials.size():
 				player.consumItem(materials[idx][1],int(materials[idx][0]))
 
 func _on_result_item_selected(index):
-	var result = RCraft.getRecipeResult(index)
+	var result = RCraft.get_recipe_result(index)
 	var rkey = result.keys()[0]
 	var craftInfo : String = result[rkey].nome + " ( x" +rkey.rsplit("x",true,1)[1]+ " ) \n"
 	craftInfo += result[rkey].desc + "\n"
 	
-	var materials = RCraft.getRecipeMaterials(index) # [qtd : int , itemType],[...]...
+	var materials = RCraft.get_recipe_materials(index) # [qtd : int , itemType],[...]...
 	var hasMaterials = true
 	var minProportion : int = 0
 	
 	for idx in materials.size():
-		var qtdInventory : int = player.getQuantityThisItem(materials[idx][1])
+		var qtdInventory : int = player.get_quantity_this_item(materials[idx][1])
 		var qtdCraft : int = int(materials[idx][0])
 		
 		hasMaterials = hasMaterials && player.hasThisItemQuantity(materials[idx][1],qtdCraft)

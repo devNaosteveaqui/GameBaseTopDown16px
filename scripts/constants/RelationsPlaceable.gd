@@ -22,4 +22,3 @@ static func findRelation(source):
 		if rel.source.nome == source.nome:
 			return rel.placeable
 	return null
-

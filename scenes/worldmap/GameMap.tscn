@@ -4,9 +4,11 @@
 [ext_resource type="Script" path="res://scripts/worldmap/GameMap.gd" id="1_7033p"]
 [ext_resource type="PackedScene" uid="uid://box05syemx16a" path="res://scenes/interfaces/Inventario.tscn" id="3_oog6s"]
 
-[node name="GameMap" type="Node2D" node_paths=PackedStringArray("inventoryInterface")]
+[node name="GameMap" type="Node2D" node_paths=PackedStringArray("inventoryInterface", "skillcallInterface")]
+texture_filter = 1
 script = ExtResource("1_7033p")
 inventoryInterface = NodePath("CanvasLayer/UI/Inventario")
+skillcallInterface = NodePath("CanvasLayer/UI/SkillCaller")
 
 [node name="TileMap" parent="." instance=ExtResource("1_05yku")]
 
@@ -23,3 +25,21 @@ grow_vertical = 2
 [node name="Inventario" parent="CanvasLayer/UI" instance=ExtResource("3_oog6s")]
 visible = false
 layout_mode = 1
+
+[node name="SkillCaller" type="LineEdit" parent="CanvasLayer/UI"]
+visible = false
+custom_minimum_size = Vector2(300, 30)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -15.5
+offset_right = 150.0
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+max_length = 64
+select_all_on_focus = true

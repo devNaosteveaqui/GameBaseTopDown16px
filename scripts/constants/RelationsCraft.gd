@@ -55,7 +55,7 @@ const RELATIONS = [
 	}
 ]
 
-static func getRecipeText(index):
+static func get_recipe_text(index):
 	var text = []
 	var recipe = RELATIONS[index]
 	var keyR = recipe.result.keys()[0]
@@ -65,11 +65,11 @@ static func getRecipeText(index):
 		text.append("/" + mkey.rsplit("x",true,1)[1] + " - " + m[mkey].nome)
 	return text
 
-static func getRecipeResult(index):
+static func get_recipe_result(index):
 	var recipe = RELATIONS[index]
 	return recipe.result
 
-static func getRecipeMaterials(index):
+static func get_recipe_materials(index):
 	var materials = []
 	for m in RELATIONS[index].materials:
 		var mkey = m.keys()[0]

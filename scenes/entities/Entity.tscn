@@ -1,35 +1,118 @@
-[gd_scene load_steps=5 format=3 uid="uid://crocrls325nj0"]
+[gd_scene load_steps=17 format=3 uid="uid://crocrls325nj0"]
 
 [ext_resource type="Script" path="res://scripts/entities/Entity.gd" id="1_dychw"]
 [ext_resource type="Script" path="res://scripts/entities/Inventory.gd" id="2_1aski"]
+[ext_resource type="Shape2D" uid="uid://bsaaw6xggt3w4" path="res://resources/entities/human/shape/human.tres" id="2_mffb8"]
+[ext_resource type="Texture2D" uid="uid://bgaa5s3s16jb7" path="res://resources/particles/affection0.png" id="2_wlqbs"]
+[ext_resource type="Texture2D" uid="uid://cpygrid3xy4qg" path="res://resources/particles/affection1.png" id="3_jdktu"]
+[ext_resource type="Texture2D" uid="uid://gsupdowae6vw" path="res://resources/particles/affection2.png" id="4_i572d"]
+[ext_resource type="Texture2D" uid="uid://ccm3qrdc8a1jx" path="res://resources/particles/affection3.png" id="5_xvk1o"]
+[ext_resource type="Texture2D" uid="uid://t8ncdabtxea8" path="res://resources/particles/affection4.png" id="6_t7ba3"]
+[ext_resource type="Texture2D" uid="uid://bjyj85d2fvf7p" path="res://resources/particles/affection5.png" id="7_n0kwl"]
+[ext_resource type="Texture2D" uid="uid://ch08sjchgcgp2" path="res://resources/particles/affection6.png" id="8_p8iln"]
+[ext_resource type="Texture2D" uid="uid://c8uhi326ixhyu" path="res://resources/particles/affection7.png" id="9_l6mee"]
+[ext_resource type="Texture2D" uid="uid://kifewycwifwu" path="res://resources/particles/affection8.png" id="10_l2phb"]
+[ext_resource type="Texture2D" uid="uid://bc8xqko28rd2f" path="res://resources/particles/affection9.png" id="11_ag7lb"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_o477l"]
-radius = 8.0
+[sub_resource type="SpriteFrames" id="SpriteFrames_xoqhr"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_wlqbs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_jdktu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_i572d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_xvk1o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_t7ba3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_n0kwl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_p8iln")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_l6mee")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_l2phb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_ag7lb")
+}],
+"loop": true,
+"name": &"relation_up",
+"speed": 12.0
+}]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_uwpdd"]
 radius = 32.0
 
-[node name="Entity" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "raycast", "lifebar", "inventory")]
+[sub_resource type="CircleShape2D" id="CircleShape2D_ajvat"]
+radius = 24.0
+
+[node name="Entity" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "particles", "raycast", "lifebar", "inventory", "regen_timer", "moviment_timer", "area_detect", "range_attack", "collision_detect_on_endjump", "collision_body_shape", "shadow")]
+y_sort_enabled = true
+motion_mode = 1
 script = ExtResource("1_dychw")
-sprite = NodePath("AnimationNode")
+sprite = NodePath("AnimatedSprite2D")
+particles = NodePath("AnimatedSprite2D2")
 raycast = NodePath("RayCast2D")
 lifebar = NodePath("Node2D/LifeBar/ColorRect/ColorRect2")
 inventory = NodePath("Inventory")
+regen_timer = NodePath("Timer")
+moviment_timer = NodePath("Timer2")
+area_detect = NodePath("Area2D")
+range_attack = NodePath("Area2D2")
+collision_detect_on_endjump = NodePath("Area2D3")
+collision_body_shape = NodePath("CollisionShape2D")
+shadow = NodePath("Sprite2D")
 
-[node name="AnimationNode" type="AnimatedSprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, 8)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_xoqhr")
+animation = &"relation_up"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_o477l")
+shape = ExtResource("2_mffb8")
+
+[node name="Area2D3" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D3"]
+shape = ExtResource("2_mffb8")
 
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_uwpdd")
 
+[node name="Area2D2" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D2"]
+shape = SubResource("CircleShape2D_ajvat")
+
 [node name="RayCast2D" type="RayCast2D" parent="."]
 target_position = Vector2(0, 24)
 
 [node name="Timer" type="Timer" parent="."]
+
+[node name="Timer2" type="Timer" parent="."]
 
 [node name="Node2D" type="Node2D" parent="."]
 
@@ -71,4 +154,9 @@ color = Color(0, 0.823529, 0, 1)
 [node name="Inventory" type="Node" parent="."]
 script = ExtResource("2_1aski")
 
-[connection signal="animation_looped" from="AnimationNode" to="." method="_on_animation_looped"]
+[node name="StatusConditions" type="Node" parent="."]
+
+[connection signal="animation_looped" from="AnimatedSprite2D" to="." method="_on_animation_looped"]
+[connection signal="animation_looped" from="AnimatedSprite2D2" to="." method="_on_particle_animation_looped"]
+[connection signal="body_entered" from="Area2D3" to="." method="_on_area_2d_3_body_entered"]
+[connection signal="body_exited" from="Area2D3" to="." method="_on_area_2d_3_body_exited"]
