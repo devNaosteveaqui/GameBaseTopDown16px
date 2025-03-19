@@ -10,14 +10,14 @@ var status_condition : Array
 var target_area : bool
 var lvl : int = 1
 
-static func createHabilidade(type):
+static func createHabilidade(type_info):
 	var hab = Habilidade.new()
-	hab.status = Status.createStatus([],type)
-	hab.habRef = type
-	hab.type = type.type
-	hab.requisitos_use = type.requisitos_use
-	hab.status_condition = type.status_condition
-	hab.target_area = type.target_area
+	hab.status = Status.createStatus([],type_info)
+	hab.habRef = type_info
+	hab.type = type_info.type
+	hab.requisitos_use = type_info.requisitos_use
+	hab.status_condition = type_info.status_condition
+	hab.target_area = type_info.target_area
 	
 	return hab
 
@@ -94,7 +94,7 @@ func createProjetil(caster:Entity):
 	hab.position = caster.get_position_on_eye()
 	hab.timer_duration = 180
 	hab.dir = caster.get_direction()
-	hab.hab_effect = status.getEffect()
+	hab.hab_effect = status.get_effect()
 	hab.type = habRef
 	hab.caster = caster
 	return hab

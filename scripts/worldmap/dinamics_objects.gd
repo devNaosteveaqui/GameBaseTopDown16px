@@ -13,7 +13,6 @@ func placeOnWorld(obj):
 		add_child(obj)
 
 func steped_on_new_chunk(e):
-	#print(e.position)
 	var r = chunks_manager.get_chunk_groups(e.position)
 	
 	if r != null:

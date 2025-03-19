@@ -183,7 +183,7 @@ func get_chunk_limits():
 func update_statistic(statistic):
 	if not statistic.keys().has('metric_class'):
 		return
-	print(statistic)
+	#print(statistic)
 	if statistic.metric_class == Estatisticas.ESTATISTICAS_CLASS.ITENS:
 		if statistic.metric == Estatisticas.ITENS.COLETADOS:
 			estatisticas.addStatisticColetados(Estatisticas.encapsuleStatistic(statistic))
@@ -235,9 +235,9 @@ func update_entity():
 			regen_timer.connect("timeout",status.activeRegen)
 func update_shadow_position():
 	if is_in_jump:
-		shadow.position = (position - nextPosition)*(-1) + Vector2(0,8)
+		shadow.offset = (position - nextPosition)*(-1) + Vector2(0,8)
 	else:
-		shadow.position = Vector2(0,8)
+		shadow.offset = Vector2(0,8)
 #func try_apply_effect_on_armor(effect):
 	#inventory.damageArmor(effect,Inventory.TORSO)
 #func try_apply_effect(statistic,effect):
@@ -467,7 +467,7 @@ func call_skill(skill:Habilidade,target):
 
 func call_magic(skill_name):
 	if habilidades.hasHabilidade(skill_name):
-		call_skill(habilidades.getHabilidade(skill_name),null)
+		call_skill(habilidades.get_habilidade(skill_name),null)
 
 func interact():
 	var interactable = raycast.get_collider()
@@ -483,16 +483,26 @@ func openInterface():
 	if struct != null:
 		pass
 func interuptSequence():
+	print("Sequencia interrompida")
 	var size_sequence = sequence_click.size() 
 	for i in size_sequence:
+		if sequence_click.size() == 0:
+			return
 		if Movimentos.isMovimentExecution(sequence_click[0]):
 			sequence_click.pop_front()
-			return
+			continue
 		sequence_click.pop_front()
 func makeMoviment(moviment):
+	# Desenvolver uma lógica melhor
+	# - Evitar spam de ações
 	if moviment_timer.is_stopped():
+		# Se estiver parado então ele irá dar inicio para acumular movimentos
 		interuptSequence()
 		moviment_timer.start(.6)
+	elif !(Movimentos.isMovimentExecution(moviment) and sequence_click.back() == moviment):
+		# Força o timer parar caso seja adicionado o movimento de execução sendo que o ultimo movimento adicionado tbm foi e o timer já foi acionado
+		moviment_timer.stop()
+	# acumula movimentos
 	sequence_click.append(moviment)
 
 func death():

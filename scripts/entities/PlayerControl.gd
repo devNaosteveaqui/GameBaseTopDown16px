@@ -44,10 +44,12 @@ func _physics_process(delta):
 		body.walk_to(press)
 
 func _input(event: InputEvent) -> void:
+	print(body.calling_skill)
 	if not body.calling_skill:
 		if event is InputEventMouseButton:
 			if not event.pressed:
 				body.makeMoviment(Movimentos.MOVIMENTS.ACTION)
+				print(event)
 			else:
 				body.set_onself(body.position.distance_to(get_global_mouse_position()) < 8)
 				#if body.position.distance_to(get_global_mouse_position()) < 8:

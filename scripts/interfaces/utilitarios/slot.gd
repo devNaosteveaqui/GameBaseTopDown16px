@@ -4,5 +4,5 @@ extends TextureRect
 @export var onHoveShadow : ColorRect
 @export var item : TextureRect
 
-func showItem(item):
-	item.texture = item.texture
+func showItem(item_info):
+	item.texture = item_info.texture

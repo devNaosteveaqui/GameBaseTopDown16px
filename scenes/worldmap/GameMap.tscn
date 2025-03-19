@@ -43,3 +43,5 @@ grow_horizontal = 2
 grow_vertical = 2
 max_length = 64
 select_all_on_focus = true
+
+[editable path="TileMap"]

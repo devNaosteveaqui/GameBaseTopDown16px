@@ -1,0 +1,5 @@
+ADD Itens :
+	Add imagem(ns) em res://resources/itens/(nome do item).png
+	Add informações basicas do item em res://scripts/constants/dicionarios/DItens.gd
+	Add uma relação de drop ou adicione a uma relação de drop existente
+	Se precisar adicionar nova relação, adicione também um placeable de origem se precisar

@@ -27,6 +27,8 @@ func initStatus():
 	inventory.resize(type.inventory_slots)
 	status = Status.createStatus(inventory,type)
 	status.connect("lifeIsZero",downStage)
+	# A cada hit, mais próximo do próximo stage
+	status.connect("lifeChange",update_lifebar)
 	status.connect("lifeIsFull",recovery)
 
 func set_stage_max(stg):
@@ -35,7 +37,10 @@ func set_stage_max(stg):
 func set_animation(spriteRef):
 	if spriteRef != "":
 		sprite.sprite_frames = load("res://resources/placeable/animation" + spriteRef)
-		sprite.play("stage_0")
+		if sprite.sprite_frames.get_animation_names().has("stage_0"):
+			sprite.play("stage_0")
+		else:
+			sprite.play("default")
 
 func set_shape(shapeRef):
 	if shapeRef != "":
@@ -84,7 +89,7 @@ func downStage():
 	if sprite.sprite_frames.get_animation_names().size() > 1:
 		if stage != 1:
 			changeStage(1)
-			drop()
+			dropm_item_by_random(1)
 			if hasRegen:
 				$Timer.start(5)
 				$Timer.connect("timeout",status.activeRegen)
@@ -94,14 +99,31 @@ func downStage():
 		breakStruct()
 
 func breakStruct():
-	drop()
+	drop_all()
 	queue_free()
 	#get_parent().remove_child(self)
 
-func drop():
+func drop_all():
 	for d in itemDrop:
-		var item : Item = Item.createItem(d[1])
-		item.set_quantity(d[0])
-		item.dropOnGround(position)
-		
-		get_parent().add_child(item)
+		drop_item(d)
+
+func dropm_item_by_random(qtd:int=-1):
+	var idx = randi()%itemDrop.size()
+	drop_item_by_id(idx,qtd)
+
+func drop_item_by_stage():
+	
+	pass
+
+func drop_item_by_id(idx,qtd:int=-1):
+	drop_item(itemDrop[idx],qtd)
+	itemDrop[idx][0] = itemDrop[idx][0] - qtd
+
+func drop_item(item_cfg,qtd:int=-1):
+	var item : Item = Item.createItem(item_cfg[1])
+	if qtd == -1:
+		item.set_quantity(item_cfg[0])
+	else:
+		item.set_quantity(qtd)
+	item.dropOnGround(position)
+	get_parent().add_child(item)

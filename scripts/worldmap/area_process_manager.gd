@@ -52,13 +52,26 @@ func ability_node(node):
 	node.set_process_unhandled_input(true)
 
 func screen_on():
+	
 	var nodes = get_tree().get_nodes_in_group(monitored_nodes_group)
+	var batch_size = 10
+	var count = 0
 	for n in nodes:
 		if n is not Marker2D or is_master:
-			ability_node(n)
+			call_deferred("ability_node",n)
+			count += 1
+			if count >= batch_size:
+				await get_tree().process_frame
+				count = 0
 
 func screen_off():
 	var nodes = get_tree().get_nodes_in_group(monitored_nodes_group)
+	var batch_size = 10
+	var count = 0
 	for n in nodes:
 		if n is not Marker2D or is_master:
-			desability_node(n)
+			call_deferred("desability_node",n)
+			count += 1
+			if count >= batch_size:
+				await get_tree().process_frame
+				count = 0

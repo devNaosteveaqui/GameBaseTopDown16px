@@ -6,21 +6,21 @@ var entity_type
 var map
 var countSpawns : int = 0
 
-static func createSpawner(entity_type,map):
+static func createSpawner(entityType,map_info):
 	var spawner = load("res://scenes/worldmap/SpawnArea.tscn").instantiate()
-	spawner.set_entity_type(entity_type)
-	spawner.set_map(map)
+	spawner.set_entity_type(entityType)
+	spawner.set_map(map_info)
 	return spawner
 
 func _ready():
 	$Timer.start(5)
 	$Timer.connect("timeout",spawnEntity)
 
-func set_entity_type(entity_type):
-	self.entity_type = entity_type
+func set_entity_type(entityType):
+	self.entity_type = entityType
 
-func set_map(map):
-	self.map = map
+func set_map(map_info):
+	self.map = map_info
 
 func spawnEntity():
 	if countSpawns < 2:

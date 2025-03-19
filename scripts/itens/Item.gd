@@ -195,9 +195,9 @@ func get_status_effect():
 func get_class_statistic():
 	return estatistica_class
 
-func dropOnGround(posSpawn):
-	self.posSpawn = posSpawn
-	self.position = posSpawn
+func dropOnGround(pos_spawn):
+	self.posSpawn = pos_spawn
+	self.position = pos_spawn
 	velocity_x = velocity_x*(randi()%3 - 1)
 
 func _on_tree_entered():

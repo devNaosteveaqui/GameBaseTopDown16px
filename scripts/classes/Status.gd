@@ -22,26 +22,26 @@ var die_when_zero : STATUS
 var inventory
 var userType
 
-static func createStatus(inventoryRef,userType):
+static func createStatus(inventoryRef,user_type):
 	var sts = Status.new()
 	sts.inventory = inventoryRef
-	sts.userType = userType
-	if userType.keys().has("vital"):
-		sts.die_when_zero = userType.vital
+	sts.userType = user_type
+	if user_type.keys().has("vital"):
+		sts.die_when_zero = user_type.vital
 	else:
 		sts.die_when_zero = STATUS.VIDA
-	if userType.has("born_status"):
-		sts.set_status(userType.born_status.duplicate(true))
-	if userType.has("born_status_max"):
-		sts.set_status_max(userType.born_status_max.duplicate(true))
-	if userType.has("born_effect"):
-		sts.set_effect(userType.born_effect.duplicate(true))
-	if userType.has("born_effect_consum"):
-		sts.set_effect_consum(userType.born_effect_consum.duplicate(true))
-	if userType.has("born_regen"):
-		sts.set_natural_regen(userType.born_regen.duplicate(true))
-	if userType.has("born_status_def"):
-		sts.set_status_def(userType.born_status_def.duplicate(true))
+	if user_type.has("born_status"):
+		sts.set_status(user_type.born_status.duplicate(true))
+	if user_type.has("born_status_max"):
+		sts.set_status_max(user_type.born_status_max.duplicate(true))
+	if user_type.has("born_effect"):
+		sts.set_effect(user_type.born_effect.duplicate(true))
+	if user_type.has("born_effect_consum"):
+		sts.set_effect_consum(user_type.born_effect_consum.duplicate(true))
+	if user_type.has("born_regen"):
+		sts.set_natural_regen(user_type.born_regen.duplicate(true))
+	if user_type.has("born_status_def"):
+		sts.set_status_def(user_type.born_status_def.duplicate(true))
 	return sts
 
 func set_status_max(stts):
@@ -83,13 +83,13 @@ func activeRegen():
 func lifeState():
 	return status[0]
 
-func applyOnStatus(statistic,sts,value):
-	if statistic.has('metric'):
-		if statistic.metric == Estatisticas.COMBATE.ENERGIA_GASTA:
-			statistic['cause'] = statistic['cause'].get_slice(" - ",0)
-			statistic['cause'] += " - " + STATUS.find_key(sts)
-		statistic['value'] = value
-	emit_signal("statistic",statistic)
+func applyOnStatus(statistic_info,sts,value):
+	if statistic_info.has('metric'):
+		if statistic_info.metric == Estatisticas.COMBATE.ENERGIA_GASTA:
+			statistic_info['cause'] = statistic_info['cause'].get_slice(" - ",0)
+			statistic_info['cause'] += " - " + STATUS.find_key(sts)
+		statistic_info['value'] = value
+	emit_signal("statistic",statistic_info)
 	if status[sts] + value > status_max[sts]:
 		status[sts] = status_max[sts]
 	else:
@@ -100,20 +100,20 @@ func applyOnStatus(statistic,sts,value):
 			emit_signal("lifeLoss")
 			if status[sts] <= 0:
 				status[sts] = 0
-				statistic['metric'] = Estatisticas.COMBATE.MORTES
-				statistic['metric_class'] = Estatisticas.ESTATISTICAS_CLASS.COMBATE
-				statistic['value'] = null
-				emit_signal("statistic",statistic)
+				statistic_info['metric'] = Estatisticas.COMBATE.MORTES
+				statistic_info['metric_class'] = Estatisticas.ESTATISTICAS_CLASS.COMBATE
+				statistic_info['value'] = null
+				emit_signal("statistic",statistic_info)
 				emit_signal("lifeIsZero")
 		elif value > 0:
 			emit_signal("lifeGain")
 			if status[sts] == status_max[sts]:
 				emit_signal("lifeIsFull")
 
-func applyEffect(statistic,effect):
+func applyEffect(statistic_info,effect_data):
 	for sts in status.size():
-		if effect[sts] != 0:
-			applyOnStatus(statistic,sts,effect[sts])
+		if effect_data[sts] != 0:
+			applyOnStatus(statistic_info,sts,effect_data[sts])
 
 func consumStatus(statistics):
 	var stsConsumable_from_equip = inventory.get_item_consumable_status()

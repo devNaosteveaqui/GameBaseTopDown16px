@@ -17,8 +17,6 @@ func _ready() -> void:
 	timer.timeout.connect(dispel)
 	timer.start(timer_duration)
 	speed = 200
-	print(get_parent().name)
-	print(self.position)
 
 func _physics_process(delta: float) -> void:
 	position = position + dir*speed*delta

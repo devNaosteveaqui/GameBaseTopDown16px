@@ -197,3 +197,18 @@ const BLOCK_GREENSLIME = {
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
 }
+const LASCA_DE_MADEIRA = {
+	'nome' : 'Lasca de Madeira',
+	'desc':"Eita lasqueira...",
+	'sprite' : 'lasca_de_madeira.png',
+	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "recurso natural vegetal",
+	'wieldable' : false,
+	'consumable' : false,
+	'canContainItem' : false,
+	'defensiveable':false,
+	'born_status' : [10,0,0,0],
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [0,0,0,0],
+	'inventory_slots' : 0
+}
