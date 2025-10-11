@@ -1,7 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://box05syemx16a"]
+[gd_scene load_steps=8 format=3 uid="uid://box05syemx16a"]
 
-[ext_resource type="PackedScene" uid="uid://74sjqjswfnkc" path="res://scenes/interfaces/utilitarios/slot.tscn" id="1_ct4hl"]
-[ext_resource type="Script" path="res://scripts/interfaces/Inventario.gd" id="1_fop3a"]
+[ext_resource type="Script" uid="uid://dwuva0vlfwp1t" path="res://scripts/interfaces/Inventario.gd" id="1_fop3a"]
 [ext_resource type="Texture2D" uid="uid://b7at5g4loqo56" path="res://resources/interface/closeButtonNormal.png" id="3_8twgk"]
 [ext_resource type="Texture2D" uid="uid://cx32oq6dq1iqv" path="res://resources/interface/craftButtonNormal.png" id="3_d8io1"]
 [ext_resource type="Texture2D" uid="uid://cfhjt43dqndtm" path="res://resources/interface/closeButtonPressed.png" id="4_4o5nb"]
@@ -9,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://bcf4ctrr6s4lc" path="res://resources/interface/craftButtonHover.png" id="5_011ne"]
 [ext_resource type="Texture2D" uid="uid://coi0w1486capc" path="res://resources/interface/closeButtonHover.png" id="5_mp3ie"]
 
-[node name="Inventario" type="Control" node_paths=PackedStringArray("gridInventory", "gridEquipamentos", "craft", "buttonWorkStation", "itemInfo")]
+[node name="Inventario" type="Control" node_paths=PackedStringArray("gridInventory", "gridEquipamentos", "craft", "buttonWorkStation", "itemInfo", "windowEquipOnSlot")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,6 +21,7 @@ gridEquipamentos = NodePath("Control/Content/WorkArea/WorkStationControl/Equipam
 craft = NodePath("Control/Content/WorkArea/WorkStationControl/Craft")
 buttonWorkStation = NodePath("Control/Content/WorkArea/Control2/ColorRect")
 itemInfo = NodePath("Control/Content/Item Info/RichTextLabel")
+windowEquipOnSlot = NodePath("Control2")
 
 [node name="Control" type="Control" parent="."]
 custom_minimum_size = Vector2(400, 300)
@@ -76,70 +76,6 @@ custom_minimum_size = Vector2(180, 160)
 layout_mode = 0
 offset_right = 180.0
 offset_bottom = 160.0
-
-[node name="IventorySlots" type="Control" parent="Control/Content"]
-visible = false
-custom_minimum_size = Vector2(140, 166)
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="GridContainer" type="GridContainer" parent="Control/Content/IventorySlots"]
-custom_minimum_size = Vector2(140, 140)
-layout_mode = 1
-offset_right = 140.0
-offset_bottom = 140.0
-theme_override_constants/h_separation = 4
-theme_override_constants/v_separation = 4
-columns = 4
-
-[node name="Slot" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot2" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot3" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot4" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot5" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot6" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot7" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot8" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot9" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot10" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot11" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot12" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot13" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot14" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot15" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
-
-[node name="Slot16" parent="Control/Content/IventorySlots/GridContainer" instance=ExtResource("1_ct4hl")]
-layout_mode = 2
 
 [node name="WorkArea" type="Control" parent="Control/Content"]
 custom_minimum_size = Vector2(180, 166)
@@ -230,7 +166,7 @@ anchor_right = 1.0
 grow_horizontal = 2
 
 [node name="Craft" type="Control" parent="Control/Content/WorkArea/WorkStationControl"]
-custom_minimum_size = Vector2(0, 80)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 1
 anchors_preset = 14
 anchor_top = 0.5
@@ -239,12 +175,24 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Result" type="OptionButton" parent="Control/Content/WorkArea/WorkStationControl/Craft"]
+[node name="Label" type="Label" parent="Control/Content/WorkArea/WorkStationControl/Craft"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 20.0
+offset_bottom = 23.0
 grow_horizontal = 2
+text = "Escolha o item:"
+
+[node name="Result" type="OptionButton" parent="Control/Content/WorkArea/WorkStationControl/Craft"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -10.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
 clip_text = true
 fit_to_longest_item = false
 
@@ -327,6 +275,80 @@ texture_normal = ExtResource("3_8twgk")
 texture_pressed = ExtResource("4_4o5nb")
 texture_hover = ExtResource("5_mp3ie")
 
+[node name="Control2" type="Control" parent="."]
+visible = false
+custom_minimum_size = Vector2(400, 50)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -20.0
+offset_right = 200.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control2"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.39215687)
+
+[node name="Content" type="Control" parent="Control2"]
+custom_minimum_size = Vector2(380, 40)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_top = -15.0
+offset_right = 190.0
+offset_bottom = 15.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OptionSlotEquip" type="OptionButton" parent="Control2/Content"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -10.0
+offset_right = 200.0
+offset_bottom = 10.0
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control2/Content"]
+custom_minimum_size = Vector2(150, 30)
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -20.0
+offset_bottom = 20.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Equipar" type="Button" parent="Control2/Content/HBoxContainer"]
+layout_mode = 2
+text = "Equipar"
+
+[node name="Cancelar" type="Button" parent="Control2/Content/HBoxContainer"]
+layout_mode = 2
+text = "Cancelar"
+
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="item_activated" from="Control/Content/Inventory" to="." method="_on_inventory_item_activated"]
 [connection signal="item_clicked" from="Control/Content/Inventory" to="." method="_on_inventory_item_clicked"]
@@ -338,3 +360,6 @@ texture_hover = ExtResource("5_mp3ie")
 [connection signal="item_activated" from="Control/Content/WorkArea/WorkStationControl/Equipamentos" to="." method="_on_equipamentos_item_activated"]
 [connection signal="item_clicked" from="Control/Content/WorkArea/WorkStationControl/Equipamentos" to="." method="_on_equipamentos_item_clicked"]
 [connection signal="button_up" from="Control/CloseButton" to="." method="_on_close_button_button_up"]
+[connection signal="item_selected" from="Control2/Content/OptionSlotEquip" to="." method="_on_option_slot_equip_item_selected"]
+[connection signal="button_up" from="Control2/Content/HBoxContainer/Equipar" to="." method="_on_equipar_button_up"]
+[connection signal="button_up" from="Control2/Content/HBoxContainer/Cancelar" to="." method="_on_cancelar_button_up"]

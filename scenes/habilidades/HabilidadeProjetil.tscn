@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://n5bqp8vn7jss"]
 
-[ext_resource type="Script" path="res://scripts/habilidades/HabilidadeProjetil.gd" id="1_ss6ao"]
+[ext_resource type="Script" uid="uid://b3caelqmlnmw5" path="res://scripts/habilidades/HabilidadeProjetil.gd" id="1_ss6ao"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_anjkf"]
 radius = 4.0

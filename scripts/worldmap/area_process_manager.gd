@@ -28,6 +28,9 @@ func desability_node(node):
 	if node is RigidBody2D:# or node is CharacterBody2D:
 		node.sleeping = true  # Pausa a simulação física
 	
+	if node is StaticBody2D :
+		node.set_monitoring_collision_state(false)
+	
 	# Pausa o processamento de entrada
 	node.set_process_input(false)
 	node.set_process_unhandled_input(false)
@@ -47,12 +50,14 @@ func ability_node(node):
 	if node is RigidBody2D:# or node is CharacterBody2D:
 		node.sleeping = false  # Pausa a simulação física
 	
+	if node is StaticBody2D:
+		node.set_monitoring_collision_state(true)
+	
 	# Pausa o processamento de entrada
 	node.set_process_input(true)
 	node.set_process_unhandled_input(true)
 
 func screen_on():
-	
 	var nodes = get_tree().get_nodes_in_group(monitored_nodes_group)
 	var batch_size = 10
 	var count = 0

@@ -19,27 +19,12 @@ func spawnEntity():
 		var targets = get_overlapping_bodies()
 		for t in targets.size():
 			if not(targets[t] == caster and not can_target_caster):
-				var statistic_dano_recebido : Dictionary = {
-					'metric':Estatisticas.COMBATE.DANO_RECEBIDO,
-					'metric_class':Estatisticas.ESTATISTICAS_CLASS.COMBATE,
-					'cause':"Habilidade Mágica "+type.nome,
-					'agent':caster.type.nome
-				}
-				var statistic_dano_causado : Dictionary = {
-					'metric':Estatisticas.COMBATE.DANO_CAUSADO,
-					'metric_class':Estatisticas.ESTATISTICAS_CLASS.COMBATE,
-					'cause':"Habilidade Mágica "+type.nome,
-					'value':hab_effect[0],
-					'agent':targets[t].type.nome
-				
-				}
-				var statistic_eliminacao : Dictionary = {
-					'metric':Estatisticas.COMBATE.ELIMINACOES,
-					'metric_class':Estatisticas.ESTATISTICAS_CLASS.COMBATE,
-					'cause':"Habilidade Mágica "+type.nome,
-					'value':hab_effect[0],
-					'agent':targets[t].type.nome
-				}
+				var statistic_dano_recebido : Dictionary = MetricasDeEstatisticas.createMetricDanoRecebido(self,caster)
+				var statistic_dano_causado : Dictionary = MetricasDeEstatisticas.createMetricDanoCausado(self,targets[t],hab_effect[0])
+				var statistic_eliminacao : Dictionary = MetricasDeEstatisticas.createMetricEliminacoes(self,targets[t],hab_effect[0])
+				#var statistic_dano_recebido : Dictionary = Estatisticas.createCombateMetric(Estatisticas.COMBATE.DANO_RECEBIDO,{'cause':"Habilidade Mágica "+type.nome,'value':null,'agent':caster.type.nome})
+				#var statistic_dano_causado : Dictionary = Estatisticas.createCombateMetric(Estatisticas.COMBATE.DANO_CAUSADO,{'cause':"Habilidade Mágica "+type.nome,'value':hab_effect[0],'agent':targets[t].type.nome})
+				#var statistic_eliminacao : Dictionary = Estatisticas.createCombateMetric(Estatisticas.COMBATE.ELIMINACOES,{'cause':"Habilidade Mágica "+type.nome,'value':hab_effect[0],'agent':targets[t].type.nome})
 				caster.update_statistic(statistic_dano_causado)
 				SystemBattle.apply_effect_on(statistic_dano_recebido,hab_effect,targets[t])
 				#targets[t].try_apply_effect(statistic_dano_recebido,hab_effect)

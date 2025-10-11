@@ -4,6 +4,7 @@ class_name Entity
 
 signal deathCharacter
 
+@export var target_efect : AnimationPlayer
 @export var sprite : AnimatedSprite2D
 @export var particles : AnimatedSprite2D
 @export var raycast : RayCast2D
@@ -16,6 +17,7 @@ signal deathCharacter
 @export var collision_detect_on_endjump : Area2D
 @export var collision_body_shape : CollisionShape2D
 @export var shadow : Sprite2D
+@export var text_action_execution : Label
 
 var direction_angle : float = 0
 var range_action : int = 24
@@ -31,11 +33,17 @@ var is_in_jump : bool = false
 var is_jumpend_collide_possible : bool = false
 var is_crouched : bool = false
 var is_particling : bool = false
+var is_death_loop_respawn : bool = false
+var is_dead : bool = false
 var characterSpeed : Vector2 = Vector2(50,50)
 var nextPosition : Vector2
 var jump_origin : Vector2
 var movimentDirection : Vector2
 var chunk_limits : Rect2
+var bodys_on_detect : Array
+var bodys_on_range_attack : Array
+
+var last_interactable
 
 var status_social : SocialStatus # a ser implementado
 var status : Status
@@ -52,7 +60,7 @@ var action_on_self : bool
 
 var nome : String
 
-static func create_entity(entity_type):
+static func create_entity(entity_type,isPlayer:bool):
 	var e : Entity= load("res://scenes/entities/Entity.tscn").instantiate()
 	e.habilidades = SistemaHabilidades.new()
 	e.status_social = SocialStatus.new()
@@ -61,25 +69,38 @@ static func create_entity(entity_type):
 	e.visual_system = SistemaVisual.new()
 	var visuals_flags = RVisual.findRelation(entity_type)
 	e.visual_system.init_flags(visuals_flags[0],visuals_flags[1])
-	e.inventory.createInventory()
+	e.inventory.create_inventory()
 	e.set_entity_type(entity_type)
-	var drops = RDrop.findRelation(entity_type)
-	if drops != null:
-		for d in drops:
-			var item : Item = Item.createItem(d[1])
-			item.set_quantity(d[0])
-			e.inventory.store_item(item,-3)#"spawnStorage"
+	if not isPlayer:
+		var drops = RDrop.findRelation(entity_type)
+		if drops != null:
+			drops = drops.drop_p
+			for d in drops:
+				var item : Item = Item.create_item(d[1])
+				item.set_quantity(d[0])
+				e.inventory.store_item(item,-3)#"spawnStorage"
+		var state_machine : SMScript = SMScript.new()
+		e.add_child(state_machine)
+		state_machine.set_body(e)
 	e.learn_basics_from_type(entity_type)
 	e.initStatus()
+	GameConfig.create_object(e)
 	return e
 
 func _ready():
+	add_to_group(GameConfig.GROUP_INTERACTABLE)
 	raycast.target_position = Vector2(0,range_action)
 	moviment_timer.timeout.connect(call_sequence)
 	nextPosition = self.position
 	jump_origin = self.position
 	inventory.item_storaged.connect(update_statistic)
+	area_detect.body_entered.connect(add_body_detected)
+	area_detect.body_exited.connect(remove_body_detected)
+	range_attack.body_entered.connect(add_body_on_range)
+	range_attack.body_exited.connect(remove_body_on_range)
+
 func _process(delta):
+	has_targeted()
 	if is_crouched:
 		if crouched_cooldown <= 0:
 			lift()
@@ -99,18 +120,20 @@ func _on_particle_animation_looped() -> void:
 func _on_area_2d_3_body_entered(body: Node2D) -> void:
 	if body != self:
 		is_jumpend_collide_possible = true
+
 func _on_area_2d_3_body_exited(body: Node2D) -> void:
 	if is_jumpend_collide_possible:
 		is_jumpend_collide_possible = false
 		if not is_in_jump:
 			set_collision_shape_flags(0,true)
 			#active_collision_shape()
+
 func initStatus():
-	status = Status.createStatus(inventory,type)
-	status.connect("lifeIsZero",death)
-	status.connect("lifeLoss",hit)
-	status.connect("lifeChange",update_lifebar)
-	status.connect("lifeIsFull",stopRegen)
+	status = Status.create_status(inventory,type)
+	status.connect("statusIsZero",status_is_zero)
+	status.connect("statusLoss",status_loss)
+	status.connect("statusChange",status_change)
+	status.connect("statusIsFull",status_is_full)
 	status.connect("statistic",update_statistic)
 func set_entity_type(entity_type):
 	set_animation(entity_type.animation)
@@ -135,6 +158,13 @@ func set_collision_shape_flags(z_idx:int, value:bool):
 	set_collision_mask_value(1,value)
 func set_chunk_limits(limits:Rect2):
 	chunk_limits = limits
+
+func set_range_attack_monitoring_collision_state(monitoring_state:bool):
+	if range_attack.monitoring != monitoring_state:
+		range_attack.monitoring = monitoring_state
+
+func set_position_on_world(x,y):
+	self.position = Vector2(x,y)
 
 func get_direction():
 	return raycast.target_position/range_action
@@ -179,31 +209,18 @@ func get_estatisticas_class():
 	return estatisticas
 func get_chunk_limits():
 	return chunk_limits
+func get_targets_nearby(): #maybe del
+	return bodys_on_detect
+	#return area_detect.get_overlapping_bodies()
+func get_area_detect():
+	return area_detect
+func get_habilitys():
+	return habilidades.lista
 
-func update_statistic(statistic):
-	if not statistic.keys().has('metric_class'):
-		return
-	#print(statistic)
-	if statistic.metric_class == Estatisticas.ESTATISTICAS_CLASS.ITENS:
-		if statistic.metric == Estatisticas.ITENS.COLETADOS:
-			estatisticas.addStatisticColetados(Estatisticas.encapsuleStatistic(statistic))
-		elif statistic.metric == Estatisticas.ITENS.CRAFTADOS:
-			estatisticas.addStatisticCraftados(Estatisticas.encapsuleStatistic(statistic))
-	elif statistic.metric_class == Estatisticas.ESTATISTICAS_CLASS.COMBATE:
-		if statistic.metric == Estatisticas.COMBATE.ENERGIA_GASTA:
-			estatisticas.addStatisticEnergiaGasta(Estatisticas.encapsuleStatistic(statistic))
-		elif statistic.metric == Estatisticas.COMBATE.DANO_RECEBIDO:
-			estatisticas.addStatisticDanoRecebido(Estatisticas.encapsuleStatistic(statistic))
-		elif statistic.metric == Estatisticas.COMBATE.DANO_CAUSADO:
-			estatisticas.addStatisticDanoCausado(Estatisticas.encapsuleStatistic(statistic))
-		elif statistic.metric == Estatisticas.COMBATE.MORTES:
-			estatisticas.addStatisticMorte(Estatisticas.encapsuleStatistic(statistic))
-		elif statistic.metric == Estatisticas.COMBATE.USO_HABILIDADE:
-			estatisticas.addStatisticUsoHabilidade(Estatisticas.encapsuleStatistic(statistic))
-		elif statistic.metric == Estatisticas.COMBATE.ELIMINACOES:
-			estatisticas.addStatisticEliminacao(Estatisticas.encapsuleStatistic(statistic))
-	else:#unequip, ConsumDrop, spawnStorage
-		pass
+
+func update_statistic(statistic_metric):
+	estatisticas.update_statistic(statistic_metric)
+
 func update_velocity():
 	self.velocity = (get_speed()*movimentDirection)*inMoviment
 func update_animation():
@@ -228,24 +245,28 @@ func update_animation_particle():
 		particles.hide()
 func update_lifebar():
 	lifebar.size.x = 20.0*(status.get_life_state())
-func update_entity():
-	if regen_ativated:
-		if regen_timer.time_left == 0:
-			regen_timer.start(10)
-			regen_timer.connect("timeout",status.activeRegen)
+#
+#func update_entity():
+	#if regen_ativated:
+		#if regen_timer.time_left == 0:
+			#regen_timer.start(10)
+			#regen_timer.connect("timeout",status.activeRegen)
+
 func update_shadow_position():
 	if is_in_jump:
 		shadow.offset = (position - nextPosition)*(-1) + Vector2(0,8)
 	else:
 		shadow.offset = Vector2(0,8)
-#func try_apply_effect_on_armor(effect):
-	#inventory.damageArmor(effect,Inventory.TORSO)
-#func try_apply_effect(statistic,effect):
-	#if not statistic.keys().has('metric'):
-		#statistic['metric'] = Estatisticas.COMBATE.DANO_RECEBIDO
-		#statistic['metric_class'] = Estatisticas.ESTATISTICAS_CLASS.COMBATE
-	#status.applyEffect(statistic,effect)
-	#interuptSequence()
+func update_character_speed():
+	pass
+
+func reset_character_speed():
+	characterSpeed = Vector2((50 if self.is_in_group(GameConfig.GROUP_ENTITY_PLAYER) else 40),50)
+func reset_character_speed_jump():
+	characterSpeed = Vector2((50 if self.is_in_group(GameConfig.GROUP_ENTITY_PLAYER) else 40),100)
+func reset_regen_timer():
+	regen_timer.start(10)
+
 func try_socialize(entity_name : String,pts : int):
 	if pts > 0:
 		is_particling = true
@@ -267,6 +288,30 @@ func try_interact(indioma_list,visual):
 	answer.pts = answer.pts_comm*(1 + answer.pts_visual)
 	return answer
 
+func try_use_item():
+	var target = get_target_on_range()
+	if onSelf:
+		target = self
+	
+	var slotIdx = inventory.getItemConsumableEquipedSlotIdx()
+	if slotIdx != -1:
+		if target != null:
+			inventory.useConsumable(slotIdx,target)
+	
+	slotIdx = inventory.getItemContainerEquipedSlotIdx()
+	if slotIdx != -1:
+		inventory.useContainer(slotIdx,target)
+
+func has_entity_nearby() -> bool:
+	#var targets = area_detect.get_overlapping_bodies()
+	
+	for e in bodys_on_detect:
+		if e == self:
+			continue
+		if e is Entity:
+			return true
+	return false
+
 func has_stepped_out_chunk():
 	if chunk_limits.size.x == 0:
 		return true
@@ -277,22 +322,116 @@ func has_stepped_out_chunk():
 
 func hasDefense():
 	return inventory.get_armor_defense().size() > 0
+
+func has_targeted():
+	var collider = get_target_on_range()
+	if !(collider == last_interactable or collider == null or collider == self):
+		if last_interactable != null:
+			if last_interactable.has_method("targeted_effect_deactive"):
+				last_interactable.targeted_effect_deactive()
+		#if collider.is_in_group(GameConfig.GROUP_INTERACTABLE):
+		if collider.has_method("targeted_effect_active"):
+			last_interactable = collider
+			collider.targeted_effect_active()
+	elif (collider == null and last_interactable != null):
+		last_interactable.targeted_effect_deactive()
+		last_interactable = null
+
+func has_status_to_use_hability(hab:Habilidade):
+	var hab_consum = hab.get_consum()
+	for s in hab_consum.size():
+		if !status.has_status_minimal_value(s,hab_consum[s]):
+			return false
+	return true
+
+func call_sequence(sequence=get_sequence()):
+	var moviment = Movimentos.get_moviment_sequence_result(sequence)
+	var skills_possibilitys = RMovimentos.findRelation(moviment)
+	var skill = habilidades.get_hability_with_req(self,skills_possibilitys)
+	if moviment != Movimentos.MOVIMENT_FAIL:
+		for sk in skills_possibilitys.size():
+			if Habilidades.hasHabilityRequirementToUse(skills_possibilitys[sk],self):
+				update_statistic(MetricasDeEstatisticas.createMetricHabilidadeUse(moviment,true))
+				#update_statistic(Estatisticas.createCombateMetric(Estatisticas.COMBATE.USO_HABILIDADE,{'cause':"Movimento",'value':null,'agent':moviment}))
+				if not habilidades.hasHabilidade(skills_possibilitys[sk].nome):
+					learn_habilidade(skills_possibilitys[sk].nome)
+			else:
+				text_action_execution.show_text_miss()
+		
+	apply_skill(skill)
+	moviment_timer.stop()
+	interuptSequence()
+
+func call_skill(skill:Habilidade,target):
+	if skill.type == Habilidades.PHYSIC_SKILL:
+		SystemBattle.makePhysicActionOn(self,target,skill)
+		text_action_execution.show_text_hitted()
+	elif skill.type == Habilidades.MAGIC_SKILL:
+		skill.invokeOnWorld(get_parent(),self)
+
+
+func call_magic(skill_name):
+	if habilidades.hasHabilidade(skill_name):
+		call_skill(habilidades.get_habilidade(skill_name),null)
+
+func add_body_detected(body):
+	bodys_on_detect.append(body)
+
+func add_body_on_range(body):
+	bodys_on_range_attack.append(body)
+
+func remove_body_detected(body):
+	bodys_on_detect.erase(body)
+
+func remove_body_on_range(body):
+	bodys_on_range_attack.erase(body)
+
+func apply_skill(skill):
+	if skill == null:
+		return
+	if skill.target_area:
+		set_range_attack_monitoring_collision_state(true)
+		for t in bodys_on_range_attack:
+			if onSelf:
+				call_skill(skill,t)
+			elif t != self:
+				call_skill(skill,t)
+		set_range_attack_monitoring_collision_state(false)
+	elif onSelf:
+		call_skill(skill,self)
+	else:
+		var target = get_target_on_range()
+		if target is Entity || target is Placeable:
+			call_skill(skill,target)
+
 func knowHabilidade(hab_name,flag_verify_lvl:bool = false,lvl_min:int =1):
 	var condition : bool = habilidades.hasHabilidade(hab_name)
 	if flag_verify_lvl and condition:
-		condition = habilidades.get_habilidade(hab_name).hasLevel(1)
+		condition = habilidades.get_habilidade(hab_name).hasLevel(lvl_min)
 	return condition
-func stopRegen():
+
+func init_regen(sts):
+	if regen_ativated:
+		status.set_regen_flag_active(sts)
+		if regen_timer.time_left == 0:
+			reset_regen_timer()
+			regen_timer.timeout.connect(status.activeRegen)
+
+func stopRegen(sts):
 	if regen_timer.time_left > 0:
-		regen_timer.stop()
+		status.set_regen_flag_deactive(sts)
+		if status.is_all_regen_deactive():
+			regen_timer.stop()
+
 func learn_basics_from_type(entity_type):
 	var hab_list = RNativeHabilitys.findRelation(entity_type)
-	for hab in hab_list:
-		learn_habilidade(hab.nome)
-	learn_habilidade(Habilidades.CONTROLE_MAGICO.nome)
-	learn_habilidade(Habilidades.ESFERA_MAGICA.nome)
-	learn_indioma(entity_type.native_lang.nome,SistemaIndiomas.LVL_MAX)
-	learn_indioma(Entities.GREENSLIME.native_lang.nome,1)
+	if hab_list != null:
+		for hab in hab_list:
+			learn_habilidade(hab.nome)
+		#learn_habilidade(Habilidades.CONTROLE_MAGICO.nome)
+		#learn_habilidade(Habilidades.ESFERA_MAGICA.nome)
+		learn_indioma(entity_type.native_lang.nome,SistemaIndiomas.LVL_MAX)
+		#learn_indioma(Entities.GREENSLIME.native_lang.nome,1)
 func learn_indioma(indioma_name,lvl):
 	if not indiomas.hasIndioma(indioma_name):
 		indiomas.addIndioma(indioma_name,lvl)
@@ -305,7 +444,8 @@ func learn_habilidade(hab_name):
 func hit():
 	hitted = true
 	set_not_in_moviment()
-	update_entity()
+	#update_entity()
+
 func lift():
 	is_crouched = false
 	collision_body_shape.position = Vector2(0,0)
@@ -336,8 +476,8 @@ func jump():
 		#deactive_collision_shape()
 
 func walk_to(target:Vector2):
-	if has_stepped_out_chunk():
-		get_parent().steped_on_new_chunk(self)
+	if has_stepped_out_chunk() and !target.is_equal_approx(Vector2.ZERO):
+		GameConfig.change_obj_chunk(self)
 	var is_only_jump : bool = false
 	var jump_dir : Vector2
 	var jump_heigth : Vector2 = Vector2(48,48) # jump_fall_distance , jump_heigth
@@ -378,9 +518,9 @@ func walk_to(target:Vector2):
 	
 	#Define a velocidade para caso esteja pulando ou não
 	if is_in_jump:
-		characterSpeed.y = 100
+		reset_character_speed_jump()
 	else:
-		characterSpeed.y = 50
+		reset_character_speed()
 	#controla s flags do sistema de pulo
 	if is_jumping_up and nextPosition.y - self.position.y > jump_heigth.y:
 		is_jumping_up = false
@@ -406,16 +546,26 @@ func walk_to(target:Vector2):
 	#z_index = 1
 	#set_collision_layer_value(1,false)
 	#set_collision_mask_value(1,false)
+
+func targeted_effect_active():
+	target_efect.play("Targeted")
+
+func targeted_effect_deactive():
+	target_efect.stop()
+
 func look_to(target : Vector2):
 	#set_moviment_direction(target)
 	raycast.target_position = target*range_action
+
 func collect(item):
 	var isStoraged = inventory.store_item(item,Estatisticas.ITENS.COLETADOS)
 	if !isStoraged:
 		drop(item)
+
 func drop(item):
 	item.dropOnGround(position)
 	get_parent().add_child(item)
+
 func dropAll(itens):
 	for i in itens.size():
 		if itens[i] != null:
@@ -426,48 +576,9 @@ func dropAll(itens):
 
 
 func placeBlock():
-	GameConfig.WorldEntitys.placeOnWorld(inventory.getItemPlaceable())
+	GameConfig.place_on_world(inventory.getItemPlaceable())
 #Aplica Habilidades Fisicas que usam de sequencia de movimentos para ser executada
-func call_sequence():
-	var moviment = Movimentos.get_moviment_sequence_result(get_sequence())
-	var skills_possibilitys = RMovimentos.findRelation(moviment)
-	var skill = habilidades.get_hability_with_req(self,skills_possibilitys)
-	if moviment != Movimentos.MOVIMENT_FAIL:
-		for sk in skills_possibilitys.size():
-			if Habilidades.hasHabilityRequirementToUse(skills_possibilitys[sk],self):
-				update_statistic({
-					'metric':Estatisticas.COMBATE.USO_HABILIDADE,
-					'metric_class':Estatisticas.ESTATISTICAS_CLASS.COMBATE,
-					'cause':"Movimento",
-					'value':null,
-					'agent':moviment
-				})
-				if not habilidades.hasHabilidade(skills_possibilitys[sk].nome):
-					learn_habilidade(skills_possibilitys[sk].nome)
-	if skill != null:
-		if skill.target_area:
-			var targets = range_attack.get_overlapping_bodies()
-			if not onSelf:
-				targets.remove_at(targets.find(self))
-			for t in targets:
-				call_skill(skill,t)
-		elif onSelf:
-			call_skill(skill,self)
-		else:
-			var target = get_target_on_range()
-			if target is Entity || target is Placeable:
-				call_skill(skill,target)
-	moviment_timer.stop()
 
-func call_skill(skill:Habilidade,target):
-	if skill.type == Habilidades.PHYSIC_SKILL:
-		SystemBattle.makePhysicActionOn(self,target,skill)
-	elif skill.type == Habilidades.MAGIC_SKILL:
-		skill.invokeOnWorld(get_parent(),self)
-
-func call_magic(skill_name):
-	if habilidades.hasHabilidade(skill_name):
-		call_skill(habilidades.get_habilidade(skill_name),null)
 
 func interact():
 	var interactable = raycast.get_collider()
@@ -483,7 +594,6 @@ func openInterface():
 	if struct != null:
 		pass
 func interuptSequence():
-	print("Sequencia interrompida")
 	var size_sequence = sequence_click.size() 
 	for i in size_sequence:
 		if sequence_click.size() == 0:
@@ -493,17 +603,37 @@ func interuptSequence():
 			continue
 		sequence_click.pop_front()
 func makeMoviment(moviment):
-	# Desenvolver uma lógica melhor
-	# - Evitar spam de ações
-	if moviment_timer.is_stopped():
-		# Se estiver parado então ele irá dar inicio para acumular movimentos
+	## Logica
+	#-> movimento realizado
+	#--> Verifica se já foram adicionados movimentos de mais, se verdade então reseta a sequencia e adiciona a pilha,
+	# caso contrário só adiciona na pilha
+	#--> A cada movimento inicia-se um timer para que seja executado o movimento
+	if sequence_click.size() + 1 > 3:
 		interuptSequence()
-		moviment_timer.start(.6)
-	elif !(Movimentos.isMovimentExecution(moviment) and sequence_click.back() == moviment):
-		# Força o timer parar caso seja adicionado o movimento de execução sendo que o ultimo movimento adicionado tbm foi e o timer já foi acionado
-		moviment_timer.stop()
-	# acumula movimentos
+	moviment_timer.start(0.4)
 	sequence_click.append(moviment)
+
+func status_is_zero(sts):
+	match sts:
+		status.die_when_zero:
+			is_dead = true
+			if self.is_in_group(GameConfig.GROUP_ENTITY_PLAYER):
+				death()
+			#death()
+		Status.STATUS.ENERGIA_FISICA:
+			init_regen(sts)
+
+func status_loss(sts):
+	if sts == Status.STATUS.VIDA:
+		hit()
+	init_regen(sts)
+
+func status_change(sts):
+	if sts == Status.STATUS.VIDA:
+		update_lifebar()
+
+func status_is_full(sts):
+	stopRegen(sts)
 
 func death():
 	dropAll(inventory.inventory)

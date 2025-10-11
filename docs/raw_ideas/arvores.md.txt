@@ -1,0 +1,2 @@
+O item folha de árvore pode cair das árvores aleatóriamente, dependendo da
+estação a frequencia com que caem pode ser maior ou menor.

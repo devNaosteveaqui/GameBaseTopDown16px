@@ -22,8 +22,7 @@ const RELATIONS = [
 		'drop' : [[5,Itens.TRONCO]],
 		'drop_by_stage' : {
 			'flag_all' : false,
-			'drop_stage' : Itens.TRONCO,
-			'drop_hit' : Itens.LASCA_DE_MADEIRA
+			'drop_hit' : [[1,Itens.LASCA_DE_MADEIRA]]
 		}
 	},
 	{
@@ -31,7 +30,6 @@ const RELATIONS = [
 		'drop' : [[10,Itens.PEDRA]],
 		'drop_by_stage' : {
 			'flag_all' : false,
-			'drop_stage' : Itens.PEDRA,
 			'drop_hit' : null
 		}
 	},
@@ -55,10 +53,19 @@ const RELATIONS = [
 		'drop_by_stage' : {
 			'flag_all' : true
 		}
+	},
+	{
+		'source' : Entities.BROWNCOW,
+		'drop' : [[2,Itens.BIFE_CRU]],
+		'drop_by_stage' : {
+			'flag_all' : false
+		}
 	}
 ]
 static func findRelation(source):
+	if source.size() < 1:
+		return null
 	for rel in RELATIONS:
 		if rel.source.nome == source.nome:
-			return rel.drop.duplicate(true)
+			return { 'drop_p' : rel.drop.duplicate(true), 'drop_s' : rel.drop_by_stage.duplicate(true)}
 	return null

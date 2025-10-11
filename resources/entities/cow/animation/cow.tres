@@ -1,0 +1,63 @@
+[gd_resource type="SpriteFrames" load_steps=9 format=3 uid="uid://2cslxrr3whmr"]
+
+[ext_resource type="Texture2D" uid="uid://lll5o6vrtlxr" path="res://resources/entities/cow/sprite/brown_cow_idle.png" id="1_n1oxg"]
+[ext_resource type="Texture2D" uid="uid://dt72xbhtnmq03" path="res://resources/entities/cow/sprite/brown_cow_lower.png" id="2_fcdoe"]
+[ext_resource type="Texture2D" uid="uid://bjay2ntnthn1o" path="res://resources/entities/cow/sprite/brown_cow_walk_0.png" id="3_x4bub"]
+[ext_resource type="Texture2D" uid="uid://cndp4shq3giau" path="res://resources/entities/cow/sprite/brown_cow_walk_1.png" id="4_n4251"]
+[ext_resource type="Texture2D" uid="uid://cgsv62tbnb0yt" path="res://resources/entities/cow/sprite/brown_cow_walk_2.png" id="5_g5tqt"]
+[ext_resource type="Texture2D" uid="uid://bskp32gwovbp1" path="res://resources/entities/cow/sprite/brown_cow_walk_3.png" id="6_gy7p2"]
+[ext_resource type="Texture2D" uid="uid://blau50uxlp8cp" path="res://resources/entities/cow/sprite/brown_cow_walk_4.png" id="7_5pj2y"]
+[ext_resource type="Texture2D" uid="uid://b1x3welgkto7l" path="res://resources/entities/cow/sprite/brown_cow_walk_5.png" id="8_i2jg7"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_n1oxg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_fcdoe")
+}],
+"loop": true,
+"name": &"default",
+"speed": 12.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"hitted",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"hitting",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_n1oxg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_x4bub")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_n4251")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_g5tqt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_fcdoe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_gy7p2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_5pj2y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_i2jg7")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
+}]

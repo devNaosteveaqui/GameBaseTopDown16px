@@ -1,0 +1,28 @@
+ADD Itens :
+	Add imagem(ns) em res://resources/itens/(nome do item).png
+	Add informações basicas do item em res://scripts/constants/dicionarios/DItens.gd
+	Add uma relação de drop ou adicione a uma relação de drop existente em RelationsDrop.gd
+	Se precisar adicionar nova relação, adicione também um placeable de origem se precisar
+
+ADD Entity :
+	Crie uma pasta pra entity especifica em res://resources/entities/(tipo de entity)
+	Crie dentro dessa pasta as pastas sprite e animation
+	Add imagens em res://resources/entities/(tipo de entity)/sprite/(nome do frame da imagem do personagem).png
+	Add uma animação em res://resources/entities/(tipo de entity)/aniamtion/(tipo de entity).png
+	Add informações basicas do entity em res://scripts/constatns/diconarios/DEntities.gd
+	Add uma relação de drop ou adicione a uma relação de drop existente em RelationsDrop.gd
+	Add uma relação de Habilidades nativas em RelationsNativeHabilitys.gd
+	Add uma relação de Visual em RelationsVisual.gd
+	Add informações de indioma e linguagem utilizadas por esse tipo de entity em res://scripts/constants/dicionarios/DIndioma.gd
+	Add um spawner se nescessário em TerrainGenerate.gd
+
+ADD Habilidade:
+	Add imagem(ns) em res://resources/habilidades/(nome da habilidade).png
+	Add informações basicas da habilidade em res://scripts/constants/dicionarios/DHabilidade.gd
+	Add uma relação de habilidade nativa em res://scripts/constants/RelationsNativeHabilitys.gd, se houver algum npc que saiba
+usar essa habilidade naturalmente.
+
+ADD Placeable:
+	Add imagem(ns) em res://resources/placeable/(nome do placeable).png
+	Add informações basicas do item em res://scripts/constants/dicionarios/DPlaceable.gd
+	Add uma relação de placeable de item origem e placeable final em RelationsPlaceable.gd

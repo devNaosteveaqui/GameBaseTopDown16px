@@ -27,6 +27,11 @@ const TERMICA = {
 	'desc' : "Linguagem que utiliza emissão de calor para se comunicar.",
 	'type' : LINGUAGEM.SENSITIVA
 }
+const GEMIDO = {
+	'nome' : "Linguagem por gemidos",
+	'desc' : "Linguagem que utiliza emissão de som através de gemidos.",
+	'type' : LINGUAGEM.AUDITIVA
+}
 const LUZMORSE = {
 	'nome' : "Luzmorse",
 	'desc' : "Indioma que consiste em mudar a opacidade em sequencias semelhantes ao código morse.",
@@ -39,9 +44,16 @@ const HUMAN_PTBR = {
 	'Linguagem' : LINGUAGEM.AUDITIVA, #Visual, Sensitiva, Auditiva, Quimica, Telepatia
 	'Comunicacao' : FALA #
 }
+const MUGIDO = {
+	'nome' : "Mugido",
+	'desc' : "Indioma de seres vivos que possuem linhagens próximas de animais bovinos.",
+	'Linguagem' : LINGUAGEM.AUDITIVA, #Visual, Sensitiva, Auditiva, Quimica, Telepatia
+	'Comunicacao' : GEMIDO #
+}
 const indiomas_lista = {
 	HUMAN_PTBR.nome : HUMAN_PTBR,
-	LUZMORSE.nome : LUZMORSE
+	LUZMORSE.nome : LUZMORSE,
+	MUGIDO.nome : MUGIDO
 }
 # Niveis de compreenção
 # Cosnegue entender algumas palavra

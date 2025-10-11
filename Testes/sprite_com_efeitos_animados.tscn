@@ -1,0 +1,50 @@
+[gd_scene load_steps=5 format=3 uid="uid://dc8fwm33b1oo6"]
+
+[ext_resource type="Texture2D" uid="uid://cs4lqhphhkvvu" path="res://resources/entities/human/sprites/pseudohuman.png" id="1_t7gcn"]
+
+[sub_resource type="Animation" id="Animation_t7gcn"]
+length = 0.001
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0.752941)]
+}
+
+[sub_resource type="Animation" id="Animation_oq2el"]
+resource_name = "Targeted"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0199424, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0.627451), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_y7xvx"]
+_data = {
+&"RESET": SubResource("Animation_t7gcn"),
+&"Targeted": SubResource("Animation_oq2el")
+}
+
+[node name="Sprite Com Efeitos Animados" type="Sprite2D"]
+self_modulate = Color(1, 1, 1, 0.752941)
+texture = ExtResource("1_t7gcn")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_y7xvx")
+}

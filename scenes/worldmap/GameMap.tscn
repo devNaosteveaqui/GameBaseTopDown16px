@@ -1,14 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://b6qkhe5ja27i7"]
+[gd_scene load_steps=6 format=3 uid="uid://b6qkhe5ja27i7"]
 
 [ext_resource type="PackedScene" uid="uid://b81svvtytywh6" path="res://scenes/worldmap/TileMap.tscn" id="1_05yku"]
-[ext_resource type="Script" path="res://scripts/worldmap/GameMap.gd" id="1_7033p"]
+[ext_resource type="Script" uid="uid://bvf2s6ebr5riw" path="res://scripts/worldmap/GameMap.gd" id="1_7033p"]
 [ext_resource type="PackedScene" uid="uid://box05syemx16a" path="res://scenes/interfaces/Inventario.tscn" id="3_oog6s"]
+[ext_resource type="Script" uid="uid://cwonpqyf6iyt1" path="res://scripts/interfaces/DebbugText.gd" id="4_p68ci"]
+[ext_resource type="Script" uid="uid://dtcnse4kmwud6" path="res://scripts/interfaces/StatisticsInterface.gd" id="5_4sb28"]
 
-[node name="GameMap" type="Node2D" node_paths=PackedStringArray("inventoryInterface", "skillcallInterface")]
+[node name="GameMap" type="Node2D" node_paths=PackedStringArray("inventoryInterface", "skillcallInterface", "gameMensage", "gameDebug", "estatisticas")]
 texture_filter = 1
 script = ExtResource("1_7033p")
 inventoryInterface = NodePath("CanvasLayer/UI/Inventario")
 skillcallInterface = NodePath("CanvasLayer/UI/SkillCaller")
+gameMensage = NodePath("CanvasLayer/UI/GameMessageNotifier")
+gameDebug = NodePath("CanvasLayer/UI/Debug")
+estatisticas = NodePath("CanvasLayer/UI/StatisticsWindow")
 
 [node name="TileMap" parent="." instance=ExtResource("1_05yku")]
 
@@ -21,6 +26,37 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Debug" type="VBoxContainer" parent="CanvasLayer/UI" node_paths=PackedStringArray("Coordenadas", "FPSAndFrameTime", "Physics", "Process", "Memory", "Rendering")]
+custom_minimum_size = Vector2(360, 240)
+layout_mode = 0
+offset_right = 360.0
+offset_bottom = 240.0
+script = ExtResource("4_p68ci")
+Coordenadas = NodePath("Coord")
+FPSAndFrameTime = NodePath("FPSAndFrameTime")
+Physics = NodePath("Physics")
+Process = NodePath("Process")
+Memory = NodePath("Memory")
+Rendering = NodePath("Rendering")
+
+[node name="Coord" type="Label" parent="CanvasLayer/UI/Debug"]
+layout_mode = 2
+
+[node name="FPSAndFrameTime" type="Label" parent="CanvasLayer/UI/Debug"]
+layout_mode = 2
+
+[node name="Physics" type="Label" parent="CanvasLayer/UI/Debug"]
+layout_mode = 2
+
+[node name="Process" type="Label" parent="CanvasLayer/UI/Debug"]
+layout_mode = 2
+
+[node name="Memory" type="Label" parent="CanvasLayer/UI/Debug"]
+layout_mode = 2
+
+[node name="Rendering" type="Label" parent="CanvasLayer/UI/Debug"]
+layout_mode = 2
 
 [node name="Inventario" parent="CanvasLayer/UI" instance=ExtResource("3_oog6s")]
 visible = false
@@ -43,5 +79,142 @@ grow_horizontal = 2
 grow_vertical = 2
 max_length = 64
 select_all_on_focus = true
+
+[node name="GameMessageNotifier" type="Panel" parent="CanvasLayer/UI"]
+visible = false
+custom_minimum_size = Vector2(200, 150)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/GameMessageNotifier"]
+custom_minimum_size = Vector2(180, 130)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -90.0
+offset_top = -65.0
+offset_right = 90.0
+offset_bottom = 65.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Title" type="Label" parent="CanvasLayer/UI/GameMessageNotifier/VBoxContainer"]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Titulo de Mensagem"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/UI/GameMessageNotifier/VBoxContainer"]
+custom_minimum_size = Vector2(180, 90)
+layout_mode = 2
+
+[node name="Content" type="Label" parent="CanvasLayer/UI/GameMessageNotifier/VBoxContainer/ScrollContainer"]
+custom_minimum_size = Vector2(180, 90)
+layout_mode = 2
+text = "Coteu
+d
+
+
+o"
+
+[node name="StatisticsWindow" type="Control" parent="CanvasLayer/UI" node_paths=PackedStringArray("estatisticas")]
+visible = false
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_4sb28")
+estatisticas = NodePath("Content/ScrollContainer/VBoxContainer")
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/StatisticsWindow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.2509804)
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/UI/StatisticsWindow/ColorRect"]
+custom_minimum_size = Vector2(590, 390)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.2509804)
+
+[node name="Content" type="Control" parent="CanvasLayer/UI/StatisticsWindow"]
+custom_minimum_size = Vector2(590, 390)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -295.0
+offset_top = -195.0
+offset_right = 295.0
+offset_bottom = 195.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/StatisticsWindow/Content"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "Estatisticas"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/UI/StatisticsWindow/Content"]
+custom_minimum_size = Vector2(0, 360)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/StatisticsWindow/Content/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [editable path="TileMap"]

@@ -11,11 +11,13 @@ const MAOS_LIVRES = "Mãos Livres"
 const LEARNED_SKILL = "Aprendido habilidade"
 const APRENDIDO_HABILIDADE = "Aprendido habilidade"
 const REPETIDO_MOVIMENTOS = "Repetido movimentos"
+
 const SOCO = {
 	'nome' : "Soco",
 	'type' : PHYSIC_SKILL,
 	'born_effect' : [-1,0,0,0],
 	'born_effect_consum' : [0,-1,0,0],
+	'passive' : false,
 	'target_area' : false,
 	'status_condition' : [],
 	'requisitos_use' : [],
@@ -26,6 +28,7 @@ const ESGRIMA = {
 	'type' : PHYSIC_SKILL,
 	'born_effect' : [-2,0,0,0],
 	'born_effect_consum' : [0,-1,0,0],
+	'passive' : true,
 	'target_area' : false,
 	'status_condition' : [],
 	'requisitos_use' : [{'objective':EMPUNHAVEL_EQUIPED}]
@@ -35,6 +38,7 @@ const PANCADA = {
 	'type' : PHYSIC_SKILL,
 	'born_effect' : [-1,0,0,0],
 	'born_effect_consum' : [0,-1,0,0],
+	'passive' : false,
 	'target_area' : false,
 	'status_condition' : [],
 	'requisitos_use' : []
@@ -44,6 +48,7 @@ const CONTROLE_MAGICO = {
 	'type' : MAGIC_SKILL,
 	'born_effect' : [0,0,0,0],
 	'born_effect_consum' : [0,0,0,0],
+	'passive' : true,
 	'target_area' : false,
 	'status_condition' : [],
 	'requisitos_use' : []
@@ -53,16 +58,29 @@ const ESFERA_MAGICA = {
 	'type' : MAGIC_SKILL,
 	'born_effect' : [-1,0,0,0],
 	'born_effect_consum' : [0,-1,0,0],
+	'passive' : false,
 	'target_area' : false,
 	'status_condition' : [],
 	'requisitos_use' : [{'objective':LEARNED_SKILL,'target':CONTROLE_MAGICO}]
+}
+const COICE = {
+	'nome' : "Coice",
+	'type' : PHYSIC_SKILL,
+	'born_effect' : [-1,0,0,0],
+	'born_effect_consum' : [0,-1,0,0],
+	'passive' : false,
+	'target_area' : false,
+	'status_condition' : [],
+	'requisitos_use' : [],
+	'requisitos_learn' : [{'objective':MAOS_LIVRES}]
 }
 const habilidades_lista = {
 	SOCO.nome : SOCO,
 	ESGRIMA.nome : ESGRIMA,
 	PANCADA.nome : PANCADA,
 	CONTROLE_MAGICO.nome : CONTROLE_MAGICO,
-	ESFERA_MAGICA.nome : ESFERA_MAGICA
+	ESFERA_MAGICA.nome : ESFERA_MAGICA,
+	COICE.nome : COICE
 }
 static func hasHabilityRequirementToUse(hab,entity:Entity):
 	var hasReq : bool = true

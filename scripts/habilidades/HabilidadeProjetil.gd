@@ -22,28 +22,16 @@ func _physics_process(delta: float) -> void:
 	position = position + dir*speed*delta
 
 func collisionOnBody(body):
+	if caster == null:
+		return
 	if not(body == caster and not can_target_caster):
-		var statistic_dano_recebido : Dictionary = {
-			'metric':Estatisticas.COMBATE.DANO_RECEBIDO,
-			'metric_class':Estatisticas.ESTATISTICAS_CLASS.COMBATE,
-			'cause':"Habilidade Mágica "+type.nome,
-			'agent':caster.type.nome
-		}
-		var statistic_dano_causado : Dictionary = {
-			'metric':Estatisticas.COMBATE.DANO_CAUSADO,
-			'metric_class':Estatisticas.ESTATISTICAS_CLASS.COMBATE,
-			'cause':"Habilidade Mágica "+type.nome,
-			'value':hab_effect[0],
-			'agent':body.type.nome
+		var statistic_dano_recebido : Dictionary = MetricasDeEstatisticas.createMetricDanoRecebido(self,caster,null)
+		var statistic_dano_causado : Dictionary = MetricasDeEstatisticas.createMetricDanoCausado(self,body,hab_effect[0])
+		var statistic_eliminacao : Dictionary = MetricasDeEstatisticas.createMetricEliminacoes(self,body,hab_effect[0])
+		#var statistic_dano_recebido : Dictionary = Estatisticas.createCombateMetric(Estatisticas.COMBATE.DANO_RECEBIDO,{'cause':"Habilidade Mágica "+type.nome,'value':null,'agent':caster.type.nome})
+		#var statistic_dano_causado : Dictionary = Estatisticas.createCombateMetric(Estatisticas.COMBATE.DANO_CAUSADO,{'cause':"Habilidade Mágica "+type.nome,'value':hab_effect[0],'agent':body.type.nome})
+		#var statistic_eliminacao : Dictionary = Estatisticas.createCombateMetric(Estatisticas.COMBATE.ELIMINACOES,{'cause':"Habilidade Mágica "+type.nome,'value':hab_effect[0],'agent':body.type.nome})
 		
-		}
-		var statistic_eliminacao : Dictionary = {
-			'metric':Estatisticas.COMBATE.ELIMINACOES,
-			'metric_class':Estatisticas.ESTATISTICAS_CLASS.COMBATE,
-			'cause':"Habilidade Mágica "+type.nome,
-			'value':hab_effect[0],
-			'agent':body.type.nome
-		}
 		caster.update_statistic(statistic_dano_causado)
 		SystemBattle.apply_effect_on(statistic_dano_recebido,hab_effect,body)
 		#body.try_apply_effect(statistic_dano_recebido,hab_effect)

@@ -10,6 +10,9 @@ func placeOnWorld(obj):
 			if obj.has_method("set_chunk_limits"):
 				obj.set_chunk_limits(r[1])
 			obj.add_to_group(r[0])
+			
+			if obj is Placeable and has_entity_in_chunk(r[0]):
+				obj.set_monitoring_collision_state(true)
 		add_child(obj)
 
 func steped_on_new_chunk(e):
@@ -22,5 +25,22 @@ func steped_on_new_chunk(e):
 			if g.begins_with("mapM_"):
 				e.remove_from_group(g)
 				e.add_to_group(r[0])
+				if e is Entity:
+					if !has_entity_in_chunk(g):
+						set_monitoring_collision_state_on_nodes_in_chunk(false,g)
+					set_monitoring_collision_state_on_nodes_in_chunk(true,r[0])
 				return
 		e.add_to_group(r[0])
+
+func has_entity_in_chunk(group_name:String):
+	var nodes = get_tree().get_nodes_in_group(group_name)
+	for n in nodes:
+		if n is Entity:
+			return true
+	return false
+
+func set_monitoring_collision_state_on_nodes_in_chunk(state:bool,group_name:String):
+	var nodes = get_tree().get_nodes_in_group(group_name)
+	for n in nodes:
+		if n.has_method("set_monitoring_collision_state"):
+			n.set_monitoring_collision_state(state)

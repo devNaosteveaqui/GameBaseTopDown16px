@@ -1,7 +1,7 @@
-[gd_scene load_steps=17 format=3 uid="uid://crocrls325nj0"]
+[gd_scene load_steps=21 format=3 uid="uid://crocrls325nj0"]
 
-[ext_resource type="Script" path="res://scripts/entities/Entity.gd" id="1_dychw"]
-[ext_resource type="Script" path="res://scripts/entities/Inventory.gd" id="2_1aski"]
+[ext_resource type="Script" uid="uid://niutcngqxe5s" path="res://scripts/entities/Entity.gd" id="1_dychw"]
+[ext_resource type="Script" uid="uid://bvysikec1m6wy" path="res://scripts/entities/Inventory.gd" id="2_1aski"]
 [ext_resource type="Shape2D" uid="uid://bsaaw6xggt3w4" path="res://resources/entities/human/shape/human.tres" id="2_mffb8"]
 [ext_resource type="Texture2D" uid="uid://bgaa5s3s16jb7" path="res://resources/particles/affection0.png" id="2_wlqbs"]
 [ext_resource type="Texture2D" uid="uid://cpygrid3xy4qg" path="res://resources/particles/affection1.png" id="3_jdktu"]
@@ -13,6 +13,44 @@
 [ext_resource type="Texture2D" uid="uid://c8uhi326ixhyu" path="res://resources/particles/affection7.png" id="9_l6mee"]
 [ext_resource type="Texture2D" uid="uid://kifewycwifwu" path="res://resources/particles/affection8.png" id="10_l2phb"]
 [ext_resource type="Texture2D" uid="uid://bc8xqko28rd2f" path="res://resources/particles/affection9.png" id="11_ag7lb"]
+[ext_resource type="PackedScene" uid="uid://b7mn7y6a3lg5u" path="res://scenes/interfaces/utilitarios/Text_Action_Execution.tscn" id="13_rgrow"]
+
+[sub_resource type="Animation" id="Animation_rgrow"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_nksxc"]
+resource_name = "Targeted"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.627451), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_rgrow"]
+_data = {
+&"RESET": SubResource("Animation_rgrow"),
+&"Targeted": SubResource("Animation_nksxc")
+}
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_xoqhr"]
 animations = [{
@@ -57,16 +95,18 @@ animations = [{
 "speed": 12.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_uwpdd"]
-radius = 32.0
-
 [sub_resource type="CircleShape2D" id="CircleShape2D_ajvat"]
 radius = 24.0
 
-[node name="Entity" type="CharacterBody2D" node_paths=PackedStringArray("sprite", "particles", "raycast", "lifebar", "inventory", "regen_timer", "moviment_timer", "area_detect", "range_attack", "collision_detect_on_endjump", "collision_body_shape", "shadow")]
+[sub_resource type="CircleShape2D" id="CircleShape2D_uwpdd"]
+radius = 40.0
+
+[node name="Entity" type="CharacterBody2D" node_paths=PackedStringArray("target_efect", "sprite", "particles", "raycast", "lifebar", "inventory", "regen_timer", "moviment_timer", "area_detect", "range_attack", "collision_detect_on_endjump", "collision_body_shape", "shadow", "text_action_execution")]
 y_sort_enabled = true
+position = Vector2(315, 193)
 motion_mode = 1
 script = ExtResource("1_dychw")
+target_efect = NodePath("AnimatedSprite2D/AnimationPlayer")
 sprite = NodePath("AnimatedSprite2D")
 particles = NodePath("AnimatedSprite2D2")
 raycast = NodePath("RayCast2D")
@@ -79,12 +119,19 @@ range_attack = NodePath("Area2D2")
 collision_detect_on_endjump = NodePath("Area2D3")
 collision_body_shape = NodePath("CollisionShape2D")
 shadow = NodePath("Sprite2D")
+text_action_execution = NodePath("Node2D/Node2D/Label")
+metadata/_edit_group_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 y_sort_enabled = true
 offset = Vector2(0, 8)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="AnimatedSprite2D"]
+libraries = {
+&"": SubResource("AnimationLibrary_rgrow")
+}
 
 [node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_xoqhr")
@@ -98,15 +145,18 @@ shape = ExtResource("2_mffb8")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D3"]
 shape = ExtResource("2_mffb8")
 
-[node name="Area2D" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-shape = SubResource("CircleShape2D_uwpdd")
-
 [node name="Area2D2" type="Area2D" parent="."]
+monitoring = false
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D2"]
 shape = SubResource("CircleShape2D_ajvat")
+
+[node name="Area2D" type="Area2D" parent="."]
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_uwpdd")
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
 target_position = Vector2(0, 24)
@@ -130,6 +180,7 @@ grow_horizontal = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="ColorRect" type="ColorRect" parent="Node2D/LifeBar"]
 custom_minimum_size = Vector2(20, 3)
@@ -142,6 +193,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.862745, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="ColorRect2" type="ColorRect" parent="Node2D/LifeBar/ColorRect"]
 layout_mode = 1
@@ -151,6 +203,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0.823529, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Node2D" type="Node2D" parent="Node2D"]
+position = Vector2(-20, -43)
+
+[node name="Label" parent="Node2D/Node2D" instance=ExtResource("13_rgrow")]
+metadata/_edit_use_anchors_ = true
 
 [node name="Inventory" type="Node" parent="."]
 script = ExtResource("2_1aski")

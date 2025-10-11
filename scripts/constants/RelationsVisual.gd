@@ -62,6 +62,25 @@ const RELATIONS = [
 			'stiffiness':[0.75],
 			'skin':[0.2]
 		}
+	},
+	{
+		'entity_type' : Entities.BROWNCOW,
+		'flags' : {
+			'appearance':"bovino",
+			'color':"brown",
+			'skin_covering':"pouco pelo",
+			'height':1.6,
+			'stiffiness':0.8,
+			'skin':0.8
+		},
+		'default_pref' : {
+			'appearance':["bovino"],
+			'color':["brown"],
+			'skin_covering':["pouco pelo"],
+			'height':[1.6],
+			'stiffiness':[0.8],
+			'skin':[0.8]
+		}
 	}
 ]
 static func findRelation(type):

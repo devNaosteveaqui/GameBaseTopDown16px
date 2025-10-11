@@ -4,16 +4,20 @@ class_name PlayerClass
 
 signal player_death(save)
 
-@onready var body : Entity = get_parent()
+const CONSUM_BUTTON_INDEX = 2
 
+@onready var body : Entity = get_parent()
 #var inventoryUI : Control
 #var skillcallUI : LineEdit
 var calling_hability : bool = false
+var consum_button : bool
 
 func _ready() -> void:
-	body.deathCharacter.connect(playerDeath)
+	body.deathCharacter.connect(PlayerClass.respawnOnPlayerDeath)
 
+@warning_ignore("unused_parameter")
 func _process(delta):
+	GameConfig.Debug_View._player_position(get_parent().position.x,get_parent().position.y)
 	if Input.is_action_just_pressed("Interact") and not body.calling_skill:
 		body.interact()
 	elif Input.is_action_just_pressed("Place") and not body.calling_skill:
@@ -21,22 +25,15 @@ func _process(delta):
 	elif Input.is_action_just_pressed("OpenInterface") and not body.calling_skill:
 		pass
 	elif Input.is_action_just_pressed("CallSkill"):
-		if GameConfig.Interface_SkillCall.is_visible_in_tree():
-			GameConfig.Interface_SkillCall.hide()
-			body.call_magic(GameConfig.Interface_SkillCall.text)
-			body.calling_skill = false
-		else:
-			GameConfig.Interface_SkillCall.show()
-			GameConfig.Interface_SkillCall.clear()
-			GameConfig.Interface_SkillCall.grab_focus()
-			body.calling_skill = true
+		GameConfig.call_skill(body)
 	elif Input.is_action_just_pressed("OpenInventory") and not body.calling_skill:
-		if GameConfig.Interface_Inventory.is_visible_in_tree():
-			GameConfig.Interface_Inventory.hide()
-		else:
-			GameConfig.Interface_Inventory.show()
-			GameConfig.Interface_Inventory.showInventory(body.inventory)
+		GameConfig.call_inventory(body)
+	elif Input.is_action_just_pressed("Statistics") and not body.calling_skill:
+		GameConfig.call_statistics(body)
+	elif Input.is_action_just_pressed("Debbug") and not body.calling_skill:
+		GameConfig.call_debbug()
 
+@warning_ignore("unused_parameter")
 func _physics_process(delta):
 	#Analisar como tornar o movimento mais fluido
 	if not body.calling_skill:
@@ -44,37 +41,44 @@ func _physics_process(delta):
 		body.walk_to(press)
 
 func _input(event: InputEvent) -> void:
-	print(body.calling_skill)
-	if not body.calling_skill:
+	if (not body.calling_skill) and (not GameConfig.on_interface_interaction):
 		if event is InputEventMouseButton:
 			if not event.pressed:
-				body.makeMoviment(Movimentos.MOVIMENTS.ACTION)
-				print(event)
+				#Talvez diferenciar Action com o botão direito do Esquerdo
+				if consum_button :
+					body.try_use_item()
+				else:
+					body.makeMoviment(Movimentos.MOVIMENTS.ACTION)
 			else:
+				consum_button = event.button_index == CONSUM_BUTTON_INDEX
 				body.set_onself(body.position.distance_to(get_global_mouse_position()) < 8)
-				#if body.position.distance_to(get_global_mouse_position()) < 8:
-					#body.set_onself(true)
-				#else:
-					#body.set_onself(false)
 		elif event is InputEventKey:
 			if event.is_action_released("move_down"):# and Input.is_action_just_released("move_down"):
 				body.makeMoviment(Movimentos.MOVIMENTS.BEHIND)
+				#GameConfig.Debug_View._player_position(get_parent().position.x,get_parent().position.y)
 			if event.is_action_released("move_up"):# and Input.is_action_just_released("move_up"):
 				body.makeMoviment(Movimentos.MOVIMENTS.FRONT)
+				#GameConfig.Debug_View._player_position(get_parent().position.x,get_parent().position.y)
 			if event.is_action_released("move_right"):# and Input.is_action_just_released("move_right"):
 				body.makeMoviment(Movimentos.MOVIMENTS.RIGHT)
+				#GameConfig.Debug_View._player_position(get_parent().position.x,get_parent().position.y)
 			if event.is_action_released("move_left"):# and Input.is_action_just_released("move_left"):
 				body.makeMoviment(Movimentos.MOVIMENTS.LEFT)
+				#GameConfig.Debug_View._player_position(get_parent().position.x,get_parent().position.y)
 			if event.is_action_released("Jump"):# and Input.is_action_just_released("Jump"):
 				body.jump()
 			if event.is_action_released("Squat"):# and Input.is_action_just_released("Squat"):
 				body.squat()
+		else:
+			pass
 
-func playerDeath():
-	emit_signal("player_death",{})
 
-static func create_player(II,SCI,save : Dictionary = {}):
-	var player = Entity.create_entity(Entities.HUMAN)
+static func respawnOnPlayerDeath():
+	WorldTileMap.spawn_on_map(PlayerClass.create_player(GameConfig.Interface_Inventory,GameConfig.Interface_SkillCall,{}),0,0)
+
+@warning_ignore("unused_parameter")
+static func create_player(II = null,SCI = null,save : Dictionary = {}):
+	var player = Entity.create_entity(Entities.HUMAN,true)
 	var playercontrol = load("res://scenes/entities/PlayerControl.tscn").instantiate()
 	#playercontrol.inventoryUI = GameConfig.Interface_Inventory#II# inventoryInterface
 	#playercontrol.skillcallUI = GameConfig.Interface_SkillCall#SCI#skillcallInterface

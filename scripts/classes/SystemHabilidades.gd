@@ -8,7 +8,7 @@ func hasHabilidade(hab_name):
 	return lista.keys().has(hab_name.to_lower())
 
 func addHabilidade(hab_name:String):
-	var nova_habilidade = Habilidade.createHabilidade(Habilidades.habilidades_lista[hab_name])
+	var nova_habilidade = Habilidade.create_habilidade(Habilidades.habilidades_lista[hab_name])
 	lista[hab_name.to_lower()] = nova_habilidade
 
 func get_habilidade(hab_name):
@@ -23,3 +23,8 @@ func get_hability_with_req(trigger,list):
 			if Habilidades.hasHabilityRequirementToUse(h,trigger):
 				return hab
 	return null
+
+
+
+static func is_hability_type(hab:Habilidade,type):
+	return hab.type == type

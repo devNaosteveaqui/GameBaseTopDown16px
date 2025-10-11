@@ -33,7 +33,7 @@ var velocity_x = 3
 var gravity_y = 800
 var gravity_x = 1
 
-static func createItem(itemType):
+static func create_item(itemType):
 	var item = load("res://scenes/itens/Item.tscn").instantiate()
 	item.nome = itemType.nome
 	item.estatistica_class = itemType.statistic_class
@@ -46,12 +46,12 @@ static func createItem(itemType):
 	item.set_inventory_slot(itemType.inventory_slots)
 	item.set_defensiveable(itemType.defensiveable)
 	item.initStatus()
-	#item.setCanContainItem(itemType.canContainItem)
+	item.set_can_contain_item(itemType.canContainItem)
 	return item
 
 func initStatus():
-	status = Status.createStatus(inventory,type)
-	status.connect("lifeIsZero",itemBreak)
+	status = Status.create_status(inventory,type)
+	status.connect("statusIsZero",itemBreak)
 	
 func set_wieldable(flag):
 	wieldable = flag
@@ -81,11 +81,14 @@ func set_collectable(flag):
 func set_drops(itemdrop):
 	if itemdrop != null:
 		for idx in itemdrop.size():
-			var drop : Item = Item.createItem(itemdrop[idx][1])
+			var drop : Item = Item.create_item(itemdrop[idx][1])
 			drop.set_quantity(itemdrop[idx][0])
 			for slot in inventory.size():
 				if inventory[slot] == null:
 					inventory[slot] = drop
+				elif inventory[slot].type == itemdrop[idx][1]:
+					inventory[slot].accumulate()
+		update_name()
 
 func set_slot_equipable(slot):
 	slotEquipable = slot
@@ -99,8 +102,24 @@ func set_type(itemType):
 func canStack(item):
 	return (item.type == type && stackable && item.stackable)
 
+func has_one_slot():
+	if canContainItem:
+		return inventory.size() == 1
+	return false
+
 func isPlaceable():
-	return placeableRel != null
+	if placeableRel != null :
+		return placeableRel.size() > 0
+	return false
+
+func is_empty(slot=-1):
+	if slot == -1:
+		for slt in inventory:
+			if slt != null:
+				return false
+		return true
+	else:
+		return inventory[slot] == null
 
 func is_sameType(item):
 	return type == item.type
@@ -119,10 +138,12 @@ func accumulate(qtd = 1):
 func decumulate(qtd = 1):
 	storaged -= qtd
 	update_name()
-	return Item.createItem(type)
+	return Item.create_item(type)
 
 func update_name():
 	self.nome = type.nome + " ( x" +str(storaged)+ " )"
+	if inventory.size() == 1 and inventory[0] != null:
+		self.nome = type.nome + " [ " + inventory[0].nome.get_slice(' (',0) + " ] ( x" +str(storaged)+ " )"
 
 func hasAtLastQuantity(qtd:int):
 	return qtd <= storaged
@@ -141,7 +162,6 @@ func _on_area_2d_body_entered(body):
 				beCollected(body)
 
 func beCollected(body):
-	
 	var parent = get_parent()
 	if parent != null:
 		parent.call_deferred("remove_child",self)
@@ -168,8 +188,9 @@ func itemBreak():
 		emit_signal("ranout",self)
 
 func dropContent():
-	set_drops(RDrop.findRelation(type))
-	return inventory
+	if RDrop.findRelation(type) != null :
+		set_drops(RDrop.findRelation(type).drop_p)
+	return inventory.duplicate(true)
 
 func get_effect_final(statsEffect:Array):
 	var effectFinal = status.get_effect()
@@ -178,7 +199,7 @@ func get_effect_final(statsEffect:Array):
 	return effectFinal
 
 func get_placeable():
-	return Placeable.createPlaceable(placeableRel)
+	return Placeable.create_placeable(placeableRel)
 
 func get_item_nome():
 	return nome

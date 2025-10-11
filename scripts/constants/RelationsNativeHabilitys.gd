@@ -10,6 +10,10 @@ const RELATIONS = [
 	{
 		'entity' : Entities.GREENSLIME,
 		'habilitys' : [Habilidades.PANCADA]
+	},
+	{
+		'entity' : Entities.BROWNCOW,
+		'habilitys' : [Habilidades.PANCADA,Habilidades.COICE]
 	}
 ]
 

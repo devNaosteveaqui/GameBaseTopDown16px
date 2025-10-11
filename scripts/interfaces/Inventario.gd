@@ -5,11 +5,14 @@ extends Control
 @export var craft : Control 
 @export var buttonWorkStation : ColorRect
 @export var itemInfo : RichTextLabel
+@export var windowEquipOnSlot : Control
 
 var WorkInterfaces = ["Craft","Equipamentos"]
 var mouseIsOn : bool = false
 var canCraft : bool = false
 var nCrafts : int = 0
+var itemSelectedToEquip : int
+var solotSelectedToEquip : int
 var player
 
 func showInventory(inventory):
@@ -54,8 +57,12 @@ func showCraftItens():
 
 func _on_inventory_item_activated(index):
 	if gridEquipamentos.is_visible_in_tree():
-		player.equipItem(index)
+		loadInventoryOptionsSlot()
+		windowEquipOnSlot.show()
+		itemSelectedToEquip = index
+		#player.equipItem(index)
 
+@warning_ignore("unused_parameter")
 func _on_inventory_item_clicked(index, at_position, mouse_button_index):
 	if mouse_button_index == 1:
 		showItemInfo(player.get_item_inventory_info(index))
@@ -65,6 +72,7 @@ func _on_inventory_item_clicked(index, at_position, mouse_button_index):
 func _on_equipamentos_item_activated(index):
 	player.unequipItem(index)
 
+@warning_ignore("unused_parameter")
 func _on_equipamentos_item_clicked(index, at_position, mouse_button_index):
 	if mouse_button_index == 1:
 		showItemInfo(player.get_item_equiped_info(index))
@@ -78,7 +86,7 @@ func _on_craft_action_button_down():
 		var recipe = RCraft.get_recipe_result(craftId)
 		var recipeKey = recipe.keys()[0]
 		var item_type = recipe[recipeKey]
-		var itemCrafted = Item.createItem(item_type)
+		var itemCrafted = Item.create_item(item_type)
 		itemCrafted.set_quantity(int(recipeKey.rsplit("x",true,1)[1]))
 		if player.store_item(itemCrafted,Estatisticas.ITENS.CRAFTADOS):
 			canCraft = false
@@ -103,10 +111,12 @@ func _on_result_item_selected(index):
 		
 		hasMaterials = hasMaterials && player.hasThisItemQuantity(materials[idx][1],qtdCraft)
 		
-		craftInfo += str(qtdInventory) + " / " + str(qtdCraft) + "\n"
+		craftInfo += str(qtdInventory) + " / " + str(qtdCraft) + " - " + materials[idx][1].nome + "\n"
 		
 		if qtdInventory > 0:
+			@warning_ignore("integer_division")
 			if minProportion > qtdCraft/qtdInventory:
+				@warning_ignore("integer_division")
 				minProportion = qtdCraft/qtdInventory
 	
 	canCraft = hasMaterials
@@ -121,6 +131,28 @@ func loadInventory():
 	showItensOnInvetory(player.inventory)
 	showItensEquiped(player.equiped)
 	showCraftItens()
+
+func loadInventoryOptionsSlot():
+	windowEquipOnSlot.get_node("Content/OptionSlotEquip").clear()
+	for slot in player.equiped.size():
+		if player.equiped[slot] != null:
+			windowEquipOnSlot.get_node("Content/OptionSlotEquip").add_icon_item(player.equiped[slot].texture,player.equiped[slot].get_item_nome())
+		else:
+			var texture : String = "res://resources/interface/"
+			match slot:
+				Inventory.HEAD:
+					texture = texture + "head_slot_symbol.png"
+				Inventory.TORSO:
+					texture = texture + "chest_slot_symbol.png"
+				Inventory.PERNAS:
+					texture = texture + "leg_slot_symbol.png"
+				Inventory.PES:
+					texture = texture + "foot_slot_symbol.png"
+				Inventory.HAND_L,Inventory.HAND_R:
+					texture = texture + "hold_slot_symbol.png"
+				_:
+					texture = texture + "finger_slot_symbol.png"
+			windowEquipOnSlot.get_node("Content/OptionSlotEquip").add_icon_item(load(texture),"vazio")
 
 func _on_color_rect_mouse_entered():
 	mouseIsOn = true
@@ -163,3 +195,16 @@ func clearInterface():
 
 func _on_close_button_button_up():
 	self.hide()
+
+
+func _on_equipar_button_up() -> void:
+	player.equipItemAt(itemSelectedToEquip,solotSelectedToEquip)
+	windowEquipOnSlot.hide()
+
+
+func _on_cancelar_button_up() -> void:
+	windowEquipOnSlot.hide()
+
+
+func _on_option_slot_equip_item_selected(index: int) -> void:
+	solotSelectedToEquip = index

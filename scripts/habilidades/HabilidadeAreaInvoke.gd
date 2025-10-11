@@ -14,7 +14,7 @@ func _ready():
 
 func spawnEntity():
 	if spawn_count < spawn_max:
-		var e : Entity = Entity.create_entity(spawn_object)
+		var e : Entity = Entity.create_entity(spawn_object, false)
 		var spawnPoint : Vector2 = Vector2(position.x,position.y)
 		
 		spawnPoint.x += randi_range(-48,48)

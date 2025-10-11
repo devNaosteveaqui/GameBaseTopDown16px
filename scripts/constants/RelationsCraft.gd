@@ -52,6 +52,12 @@ const RELATIONS = [
 		'materials' : [
 			{'i0x4':Itens.GOSMA_SLIME_VERDE}
 		]
+	},
+	{
+		'result' : {'x1':Itens.BALDE_MADEIRA},
+		'materials' : [
+			{'i0x4':Itens.TABUA}
+		]
 	}
 ]
 

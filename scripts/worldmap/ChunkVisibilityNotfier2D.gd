@@ -1,15 +1,16 @@
 extends Node2D
 
-@export var TILE_SIZE : Vector2i
-@export var CHUNK_SIZE_IN_TILES : Vector2i # Tamanho do Chunk em Tiles
-@export var NOTIFIER_SIZE_IN_CHUNKS : Vector2i # Tamanho do Notifier em Chunks
-@export var ENABLER_SIZE_IN_NOTIFIER : Vector2i # Tamanho do Enabler em Notifiers
+@export var TILE_SIZE : Vector2i # (32,32)
+@export var CHUNK_SIZE_IN_TILES : Vector2i # Tamanho do Chunk em Tiles (16,16)
+@export var NOTIFIER_SIZE_IN_CHUNKS : Vector2i # Tamanho do Notifier em Chunks (2,2)
+@export var ENABLER_SIZE_IN_NOTIFIER : Vector2i # Tamanho do Enabler em Notifiers (2,2)
 @export var AREAS_VISIVEIS : Array
 
 var visible_map : Array = []
 var chunk_count : int
 
 func _ready() -> void:
+	_init_values_predef()
 	var notifier_size = Vector2i(TILE_SIZE.x*CHUNK_SIZE_IN_TILES.x*NOTIFIER_SIZE_IN_CHUNKS.x,TILE_SIZE.y*CHUNK_SIZE_IN_TILES.y*NOTIFIER_SIZE_IN_CHUNKS.y) #Tamanho em Tiles
 	var enabler_size = Vector2i(notifier_size.x*ENABLER_SIZE_IN_NOTIFIER.x,notifier_size.y*ENABLER_SIZE_IN_NOTIFIER.y) #Tamanho em Tiles
 	var chunks_count_on = Vector2i(Game.MAP_WIDTH/CHUNK_SIZE_IN_TILES.x,Game.MAP_HEIGTH/CHUNK_SIZE_IN_TILES.y) # Dimensão em Chunks
@@ -88,11 +89,21 @@ func _ready() -> void:
 			#submarker.monitored_area.position.y = markerA.position.y + ((notifier_index/ENABLER_SIZE_IN_NOTIFIER.y)*2 - 1)*notifier_size.y
 			submarker.monitored_area.size.x = notifier_size.x
 			submarker.monitored_area.size.y = notifier_size.y
-			var cvn_cs : CollisionShape2D = CollisionShape2D.new()
-			cvn.add_child(cvn_cs)
-			cvn_cs.shape = RectangleShape2D.new()
-			cvn_cs.shape.size = cvn.rect.size
+			#Apenas para conseguir visualizar onde está o Notifier
+			#var cvn_cs : CollisionShape2D = CollisionShape2D.new()
+			#cvn.add_child(cvn_cs)
+			#cvn_cs.shape = RectangleShape2D.new()
+			#cvn_cs.shape.size = cvn.rect.size
 
+func _init_values_predef():
+	if TILE_SIZE == Vector2i.ZERO:
+		TILE_SIZE = Vector2i(32,32)
+	if CHUNK_SIZE_IN_TILES == Vector2i.ZERO:
+		CHUNK_SIZE_IN_TILES = Vector2i(16,16)
+	if NOTIFIER_SIZE_IN_CHUNKS == Vector2i.ZERO:
+		NOTIFIER_SIZE_IN_CHUNKS = Vector2i(2,2)
+	if ENABLER_SIZE_IN_NOTIFIER == Vector2i.ZERO:
+		ENABLER_SIZE_IN_NOTIFIER = Vector2i(2,2)
 
 func chunk_discharge(cn:int,ce:int):
 	if ce == -1:
@@ -103,7 +114,8 @@ func chunk_discharge(cn:int,ce:int):
 		AREAS_VISIVEIS.remove_at(AREAS_VISIVEIS.find(visible_map[cn]))
 		get_parent().unload_map(visible_map[cn].markers_notifiers[ce].get_monitored_area())
 	else:
-		print("Já está descarregado")
+		#print("Já está descarregado")
+		pass
 
 func chunk_charge(cn:int,ce:int):
 	if ce == -1:
@@ -114,7 +126,8 @@ func chunk_charge(cn:int,ce:int):
 		AREAS_VISIVEIS.append(visible_map[cn])
 		get_parent().load_map(visible_map[cn].markers_notifiers[ce].get_monitored_area())
 	else:
-		print("Já esta carregado")
+		#print("Já esta carregado")
+		pass
 
 func get_chunk_groups(pos:Vector2):
 	for area in AREAS_VISIVEIS:
@@ -125,6 +138,6 @@ func get_chunk_groups(pos:Vector2):
 
 func vector_in_area(pos:Vector2,rect:Rect2):
 	var r : bool = false
-	r = rect.position.x - pos.x < 0 && pos.x < rect.position.x + rect.size.x
-	r = r && rect.position.y - pos.y < 0 && pos.y < rect.position.y + rect.size.y
+	r = rect.position.x - pos.x <= 0 && pos.x < rect.position.x + rect.size.x
+	r = r && rect.position.y - pos.y <= 0 && pos.y < rect.position.y + rect.size.y
 	return r

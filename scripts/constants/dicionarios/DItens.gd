@@ -12,7 +12,6 @@ const TRONCO = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
@@ -27,7 +26,6 @@ const PEDRA = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
@@ -42,7 +40,6 @@ const FRUTA_VERMELHA = {
 	'consumable' : true,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [2,1,0,0],
 	'inventory_slots' : 0
@@ -57,7 +54,6 @@ const GOSMA_SLIME_VERMELHO = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
@@ -72,7 +68,6 @@ const GOSMA_SLIME_VERDE = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
@@ -87,7 +82,6 @@ const TABUA = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
@@ -102,7 +96,6 @@ const PROTETOR_DE_MAO = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
@@ -117,7 +110,6 @@ const GRAVETO = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
@@ -132,7 +124,6 @@ const ESPADA_MADEIRA = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [-1,0,0,0],
 	'inventory_slots' : 0
@@ -147,7 +138,6 @@ const CABO_MADEIRA = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [-1,0,0,0],
 	'inventory_slots' : 0
@@ -162,7 +152,6 @@ const MACHADO_MADEIRA = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [-1,0,0,0],
 	'inventory_slots' : 0
@@ -177,7 +166,6 @@ const CABECA_MACHADO_MADEIRA = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
@@ -192,7 +180,6 @@ const BLOCK_GREENSLIME = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_sstatus_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
 	'inventory_slots' : 0
@@ -207,8 +194,50 @@ const LASCA_DE_MADEIRA = {
 	'consumable' : false,
 	'canContainItem' : false,
 	'defensiveable':false,
-	'born_status' : [10,0,0,0],
 	'born_status_max' : [10,0,0,0],
 	'born_effect' : [0,0,0,0],
+	'inventory_slots' : 0
+}
+const BIFE_CRU = {
+	'nome' : 'Bife cru',
+	'desc': "Talvez um pouco de sal e cebola picada, um tempinha na frigideira e pronto, um bife acebolado.",
+	'sprite' : 'bife_cru.png',
+	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "carne de mob",
+	'wieldable' : false,
+	'consumable' : true,
+	'canContainItem' : false,
+	'defensiveable':false,
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [1,0,0,0],
+	'inventory_slots' : 0
+}
+const BALDE_MADEIRA = {
+	'nome' : 'Balde de Madeira',
+	'desc': "Um simples balde de madeira para conter quase todos os tipos de liquidos.",
+	'sprite' : 'balde_madeira.png',
+	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "utilitário container",
+	'wieldable' : false,
+	'consumable' : false,
+	'consumable_filled' : true,
+	'canContainItem' : true,
+	'defensiveable':false,
+	'born_status_max' : [10,1,0,0],
+	'born_effect' : [-1,0,0,0],
+	'inventory_slots' : 1
+}
+const LEITE = {
+	'nome' : 'Leite',
+	'desc': "Lactose, doce nectar...",
+	'sprite' : 'folha.png',
+	'equipable' : [Inventory.HAND_L,Inventory.HAND_R],
+	'statistic_class' : "laticinio",
+	'wieldable' : false,
+	'consumable' : true,
+	'canContainItem' : false,
+	'defensiveable':false,
+	'born_status_max' : [10,0,0,0],
+	'born_effect' : [1,0,0,0],
 	'inventory_slots' : 0
 }
