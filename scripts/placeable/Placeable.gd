@@ -17,14 +17,16 @@ var itemDropByHit
 var qtdByHit : int = 1
 var inventory : Array = []
 var type
+var hitted_by
 
 static func create_placeable(placeableType):
-	var placeable = load("res://scenes/placeable/Placeable.tscn").instantiate()
+	var placeable = Placeables.OBJECT_PLACEABLE.instantiate()
 	var drops = RDrop.findRelation(placeableType)
-	if drops == null:
-		return null
-	placeable.itemDrop = drops.drop_p
-	placeable.itemDropByHit = drops.drop_s
+	#if drops == null:
+		#return null
+	if drops != null:
+		placeable.itemDrop = drops.drop_p
+		placeable.itemDropByHit = drops.drop_s
 	placeable.type = placeableType
 	placeable.set_shape(placeableType.shape)
 	placeable.set_animation(placeableType.animation)
@@ -36,17 +38,17 @@ static func create_placeable(placeableType):
 func initStatus():
 	add_to_group(GameConfig.GROUP_INTERACTABLE)
 	inventory.resize(type.inventory_slots)
-	status = Status.create_status(inventory,type)
+	status = Status.create_status(type)
 	status.connect("statusIsZero",status_is_zero)
 	# A cada hit, mais próximo do próximo stage
-	status.connect("statusChange",status_change) # FIX IT - Precisa bater porém não trocar de estado
+	#status.connect("statusChange",status_change) # FIX IT - Precisa bater porém não trocar de estado
 	status.connect("statusIsFull",status_is_full)
 	set_monitoring_collision_state(false)
 
 func status_is_zero(sts):
 	downStage()
 func status_change(sts):
-	hitted()
+	pass #Antes chamava o hitted()
 func status_is_full(sts):
 	recovery()
 
@@ -54,17 +56,20 @@ func set_stage_max(stg):
 	stageMax = stg
 
 func set_animation(spriteRef):
-	if spriteRef != "":
-		sprite.sprite_frames = load("res://resources/placeable/animation" + spriteRef)
-		if sprite.sprite_frames.get_animation_names().has("stage_0"):
-			sprite.play("stage_0")
-		else:
-			sprite.play("default")
+	if spriteRef == null:
+		return
+	sprite.sprite_frames = spriteRef
+	if sprite.sprite_frames.get_animation_names().has("stage_0"):
+		sprite.play("stage_0")
+	else:
+		sprite.play("default")
 
 func set_shape(shapeRef):
-	if shapeRef != "":
-		shape.shape=load("res://resources/placeable/shape" + shapeRef)
-		body_area.get_child(0).shape=load("res://resources/placeable/shape" + shapeRef)
+	if shapeRef != null:
+		shape.shape = shapeRef
+		#shape.shape=load("res://resources/placeable/shape" + shapeRef)
+		body_area.get_child(0).shape = shapeRef
+		#body_area.get_child(0).shape=load("res://resources/placeable/shape" + shapeRef)
 
 func set_monitoring_collision_state(monitoring_state:bool):
 	$CollisionShape2D.disabled = !monitoring_state
@@ -96,28 +101,11 @@ func recovery():
 		changeStage(stage+1)
 		status.set_status(type.born_status*stage)
 
-#func try_apply_effect(statistic,effect):
-	#status.applyEffect(statistic,effect)
-
 func hasDefense():
-	return status.get_defense()[0] > 0
+	return StatusInterface.get_defense(status.general_status)[0] > 0
 
 func canStoreItens():
 	return inventory.size() > 0
-
-func get_reduction_effect_by_item_hardness(item):
-	var effect_reduction : float = 1
-	var selfHardness = RUseable.findRelation(type).on_item
-	var itemHardness = RUseable.findRelation(item.type).on_placeable
-	
-	var rdif = selfHardness - itemHardness
-	
-	if rdif > 0:
-		item.try_apply_effect([-1 + (-1)*(rdif/2),0,0,0])
-	else:
-		effect_reduction = 0
-		item.try_apply_effect([-1,0,0,0])
-	return effect_reduction
 
 func get_status_class():
 	return status
@@ -129,9 +117,9 @@ func downStage():
 			drop_item_by_random(itemDrop,qtdByDrop)
 			if hasRegen:
 				$Timer.start(5)
-				$Timer.connect("timeout",status.activeRegen)
+				$Timer.connect("timeout",StatusInterface.apply_regen.bind(status))
 			else:
-				status.fillLife()
+				StatusInterface.fill_life(status)
 		else:
 			breakStruct()
 	else:
@@ -139,6 +127,10 @@ func downStage():
 
 func hitted():
 	drop_item_by_hit()
+
+func hitted_by_item(item_type_used):
+	hitted_by = item_type_used
+	hitted()
 
 func targeted_effect_active():
 	target_efect.play("Targeted")
@@ -173,8 +165,8 @@ func drop_item_by_id(source:Array,idx,qtd:int=-1):
 func drop_item(item_cfg,qtd:int=-1):
 	var item : Item = Item.create_item(item_cfg[1])
 	if qtd == -1:
-		item.set_quantity(item_cfg[0])
+		ItemInterface.set_quantity(item,item_cfg[0])
 	else:
-		item.set_quantity(qtd)
-	item.dropOnGround(position)
+		ItemInterface.set_quantity(item,qtd)
+	item._drop_on_ground(position)
 	get_parent().add_child(item)

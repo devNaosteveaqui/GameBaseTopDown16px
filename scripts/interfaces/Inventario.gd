@@ -7,7 +7,12 @@ extends Control
 @export var itemInfo : RichTextLabel
 @export var windowEquipOnSlot : Control
 
-var WorkInterfaces = ["Craft","Equipamentos"]
+const SIGNAL_IVENTORY_UPDATE = "inventoryUpdated"
+const EMPTY_SLOT_LABEL = "vazio"
+const NODE_NAME_RESULT = "Result"
+const NODE_OPTION_SLOT_EQUIP = "Content/OptionSlotEquip"
+
+var Work_Interfaces_Labels = ["Craft","Equipamentos"]
 var mouseIsOn : bool = false
 var canCraft : bool = false
 var nCrafts : int = 0
@@ -17,43 +22,30 @@ var player
 
 func showInventory(inventory):
 	self.player = inventory
-	self.player.connect("inventoryUpdated",loadInventory)
+	self.player.connect(SIGNAL_IVENTORY_UPDATE,loadInventory)
 	loadInventory()
 
 func showItensOnInvetory(itens:Array):
 	for slot in itens.size():
 		if itens[slot] != null:
-			gridInventory.add_item(itens[slot].get_item_nome(),itens[slot].texture)
+			gridInventory.add_item(ItemInterface.get_item_nome(itens[slot]),ItemInterface.get_texture(itens[slot].type))
 		else:
-			gridInventory.add_item("vazio")
+			gridInventory.add_item(EMPTY_SLOT_LABEL)
 
 func showItensEquiped(itens:Array):
 	for slot in itens.size():
 		if itens[slot] != null:
-			gridEquipamentos.add_item(itens[slot].get_item_nome(),itens[slot].texture)
+			gridEquipamentos.add_item(ItemInterface.get_item_nome(itens[slot]),itens[slot].texture)
 		else:
 			#gridEquipamentos.add_item("vazio")
-			var texture : String = "res://resources/interface/"
-			match slot:
-				Inventory.HEAD:
-					texture = texture + "head_slot_symbol.png"
-				Inventory.TORSO:
-					texture = texture + "chest_slot_symbol.png"
-				Inventory.PERNAS:
-					texture = texture + "leg_slot_symbol.png"
-				Inventory.PES:
-					texture = texture + "foot_slot_symbol.png"
-				Inventory.HAND_L,Inventory.HAND_R:
-					texture = texture + "hold_slot_symbol.png"
-				_:
-					texture = texture + "finger_slot_symbol.png"
-			gridEquipamentos.add_item("vazio",load(texture))
+			var texture : String = Inventory.EMPTY_SLOT_PLACEHOLDER[slot]
+			gridEquipamentos.add_item(EMPTY_SLOT_LABEL,load(texture))
 
 func showCraftItens():
 	for idx in RCraft.RELATIONS.size():
 		var recipe = RCraft.get_recipe_result(idx)
-		craft.get_node("Result").add_item(recipe[recipe.keys()[0]].nome)
-		craft.get_node("Result").select(-1)
+		craft.get_node(NODE_NAME_RESULT).add_item(recipe[recipe.keys()[0]].nome)
+		craft.get_node(NODE_NAME_RESULT).select(-1)
 
 func _on_inventory_item_activated(index):
 	if gridEquipamentos.is_visible_in_tree():
@@ -81,13 +73,13 @@ func _on_equipamentos_item_clicked(index, at_position, mouse_button_index):
 
 
 func _on_craft_action_button_down():
-	var craftId = craft.get_node("Result").get_selected_id()
+	var craftId = craft.get_node(NODE_NAME_RESULT).get_selected_id()
 	if craftId > -1 && canCraft:
 		var recipe = RCraft.get_recipe_result(craftId)
 		var recipeKey = recipe.keys()[0]
 		var item_type = recipe[recipeKey]
-		var itemCrafted = Item.create_item(item_type)
-		itemCrafted.set_quantity(int(recipeKey.rsplit("x",true,1)[1]))
+		var itemCrafted = ItemInterface.create_data_from_type(item_type,player)
+		ItemInterface.set_quantity(itemCrafted,int(recipeKey.rsplit("x",true,1)[1]))
 		if player.store_item(itemCrafted,Estatisticas.ITENS.CRAFTADOS):
 			canCraft = false
 			nCrafts -= 1
@@ -109,7 +101,7 @@ func _on_result_item_selected(index):
 		var qtdInventory : int = player.get_quantity_this_item(materials[idx][1])
 		var qtdCraft : int = int(materials[idx][0])
 		
-		hasMaterials = hasMaterials && player.hasThisItemQuantity(materials[idx][1],qtdCraft)
+		hasMaterials = hasMaterials && player.has_this_item_quantity(materials[idx][1],qtdCraft)
 		
 		craftInfo += str(qtdInventory) + " / " + str(qtdCraft) + " - " + materials[idx][1].nome + "\n"
 		
@@ -133,26 +125,13 @@ func loadInventory():
 	showCraftItens()
 
 func loadInventoryOptionsSlot():
-	windowEquipOnSlot.get_node("Content/OptionSlotEquip").clear()
+	windowEquipOnSlot.get_node(NODE_OPTION_SLOT_EQUIP).clear()
 	for slot in player.equiped.size():
 		if player.equiped[slot] != null:
-			windowEquipOnSlot.get_node("Content/OptionSlotEquip").add_icon_item(player.equiped[slot].texture,player.equiped[slot].get_item_nome())
+			windowEquipOnSlot.get_node(NODE_OPTION_SLOT_EQUIP).add_icon_item(player.equiped[slot].texture,ItemInterface.get_item_nome(player.equiped[slot]))
 		else:
-			var texture : String = "res://resources/interface/"
-			match slot:
-				Inventory.HEAD:
-					texture = texture + "head_slot_symbol.png"
-				Inventory.TORSO:
-					texture = texture + "chest_slot_symbol.png"
-				Inventory.PERNAS:
-					texture = texture + "leg_slot_symbol.png"
-				Inventory.PES:
-					texture = texture + "foot_slot_symbol.png"
-				Inventory.HAND_L,Inventory.HAND_R:
-					texture = texture + "hold_slot_symbol.png"
-				_:
-					texture = texture + "finger_slot_symbol.png"
-			windowEquipOnSlot.get_node("Content/OptionSlotEquip").add_icon_item(load(texture),"vazio")
+			var texture : String = Inventory.EMPTY_SLOT_PLACEHOLDER[slot]
+			windowEquipOnSlot.get_node(NODE_OPTION_SLOT_EQUIP).add_icon_item(load(texture),EMPTY_SLOT_LABEL)
 
 func _on_color_rect_mouse_entered():
 	mouseIsOn = true
@@ -167,11 +146,11 @@ func _on_color_rect_gui_input(event):
 		if event.pressed:
 			buttonWorkStation.get_node("Clicked").show()
 			if craft.is_visible_in_tree():
-				buttonWorkStation.get_node("Label").text = WorkInterfaces[1]
+				buttonWorkStation.get_node("Label").text = Work_Interfaces_Labels[1]
 				craft.hide()
 				gridEquipamentos.show()
 			elif gridEquipamentos.is_visible_in_tree():
-				buttonWorkStation.get_node("Label").text = WorkInterfaces[0]
+				buttonWorkStation.get_node("Label").text = Work_Interfaces_Labels[0]
 				gridEquipamentos.hide()
 				craft.show()
 		else:
@@ -190,11 +169,11 @@ func clearInterface():
 	itemInfo.text = ""
 	gridEquipamentos.clear()
 	gridInventory.clear()
-	craft.get_node("Result").select(-1)
-	craft.get_node("Result").clear()
+	craft.get_node(NODE_NAME_RESULT).select(-1)
+	craft.get_node(NODE_NAME_RESULT).clear()
 
 func _on_close_button_button_up():
-	self.hide()
+	GameConfig.call_inventory(null)
 
 
 func _on_equipar_button_up() -> void:

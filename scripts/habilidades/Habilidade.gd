@@ -13,7 +13,7 @@ var lvl : int = 1
 
 static func create_habilidade(type_info):
 	var hab = Habilidade.new()
-	hab.status = Status.create_status([],type_info)
+	hab.status = Status.create_status(type_info)
 	hab.habRef = type_info
 	hab.type = type_info.type
 	hab.requisitos_use = type_info.requisitos_use
@@ -26,16 +26,21 @@ func get_nome():
 	return habRef.nome
 
 func get_consum():
-	var consum : Array = status.get_consum_status()
+	var consum : Array = StatusInterface.get_consum_status(status.general_status)
 	for i in consum.size():
 		consum[i] = consum[i]*lvl
 	return consum
 
-func get_effect():
-	var effect : Array = status.get_effect()
-	for i in effect.size():
-		effect[i] = effect[i]*lvl
-	return effect
+func get_effect(has_item:bool=false):
+	var effect : Array = StatusInterface.get_effect(status.general_status)
+	var habEffect : Array = []
+	habEffect.resize(effect.size())
+	if requireItemOnHand() and !has_item:
+		habEffect.fill(0)
+	else:
+		for i in effect.size():
+			habEffect[i] = effect[i]*lvl
+	return habEffect
 
 func get_status_condition():
 	return status_condition
@@ -67,7 +72,7 @@ func create_area_effect(caster:Entity):
 	hab.spawn_max = 10
 	hab.caster = caster
 	hab.type = habRef
-	hab.hab_effect = status.get_effect()
+	hab.hab_effect = StatusInterface.get_effect(status.general_status)
 	hab.time_cooldown = 1.5
 	hab.position = caster.get_position_on_eye()
 	GameConfig.create_object(hab)
@@ -88,7 +93,7 @@ func create_projetil(caster:Entity):
 	hab.position = caster.get_position_on_eye()
 	hab.timer_duration = 180
 	hab.dir = caster.get_direction()
-	hab.hab_effect = status.get_effect()
+	hab.hab_effect = StatusInterface.get_effect(status.general_status)
 	hab.type = habRef
 	hab.caster = caster
 	GameConfig.create_object(hab)
@@ -98,16 +103,16 @@ static func calculateOnConsumStatus(v_step:float,v_base,stats):
 	return v_step*(v_base+stats)
 
 func calculateAreaEffect():
-	return calculateOnConsumStatus(16,lvl,status.get_consum_status_at(3))
+	return calculateOnConsumStatus(16,lvl,StatusInterface.get_consum_status_at(status.general_status,3))
 
 func calculateTimerDurationEffect():
-	return calculateOnConsumStatus(60,lvl,status.get_consum_status_at(3))
+	return calculateOnConsumStatus(60,lvl,StatusInterface.get_consum_status_at(status.general_status,3))
 
 func calculateTimerCooldownEffect():
-	return calculateOnConsumStatus(1/60,lvl,status.get_consum_status_at(3))
+	return calculateOnConsumStatus(1/60,lvl,StatusInterface.get_consum_status_at(status.general_status,3))
 
 func calculateDistanceFired():
-	return 16*(2+randi_range(lvl,lvl+status.get_consum_status()[3]))
+	return 16*(2+randi_range(lvl,lvl+StatusInterface.get_consum_status(status.general_status)[3]))
 
 func requireItemOnHand():
 	for r in requisitos_use:

@@ -11,14 +11,10 @@ static func makePhysicActionOn(trigger,target,habilidade:Habilidade):
 	
 	var statistic_uso_habilidade = MetricasDeEstatisticas.createMetricHabilidadeUse(habilidade)
 	var statistic_energy_cost = MetricasDeEstatisticas.createMetricConsumoDeEnergia("self")
-	#var statistic_uso_habilidade = Estatisticas.createCombateMetric(Estatisticas.COMBATE.USO_HABILIDADE,{'cause':"Habilidade Fisica",'value':null,'agent':habilidade.get_nome()})
-	#var statistic_energy_cost = Estatisticas.createCombateMetric(Estatisticas.COMBATE.ENERGIA_GASTA,{'cause':"Consumo de Energia por habilidade",'value':null,'agent':"self"})
 	
 	trigger.update_statistic(statistic_uso_habilidade)
-	#trigger.try_apply_effect(statistic_energy_cost,energy_consum)
 	SystemBattle.apply_effect_on(statistic_energy_cost,energy_consum,trigger)
-	trigger.status.consumStatus({'agent':"self"})
-	var weapon = trigger.inventory.get_principal_item()
+	StatusInterface.apply_consum_status({'agent':"self"},trigger.status,trigger.inventory)
 	
 	var statistic_dano_recebido : Dictionary = Estatisticas.createCombateMetric(Estatisticas.COMBATE.DANO_RECEBIDO)
 	var statistic_dano_causado : Dictionary = Estatisticas.createCombateMetric(Estatisticas.COMBATE.DANO_CAUSADO)
@@ -28,105 +24,105 @@ static func makePhysicActionOn(trigger,target,habilidade:Habilidade):
 	var value
 	var agent = target.type.nome
 	
-	#var statistic_text = "Dano fisico "
 	var habEffect
 	var agent_name = target.type.nome
 	var effect_result : Array
-	
-	if weapon == null:
-		#statistic_text += "desarmado "
-		cause += "desarmado "
-		if habilidade.requireItemOnHand():
-			#statistic_text += "sem habilidade"
-			cause += "sem habilidade"
-			habEffect = []
-			habEffect.resize(habilidade.get_effect().size())
-			habEffect.fill(0)
-		else:
-			#statistic_text += "com " + habilidade.get_nome()
-			cause += "com " + habilidade.get_nome()
-			habEffect = habilidade.get_effect()
-		
-		#statistic_dano_causado.cause = statistic_text
-		#statistic_dano_recebido.cause = statistic_text
-		#statistic_eliminacao.cause = statistic_text
+	if target.has_method("hitted_by_item"):
+		target.hitted_by_item(trigger.get_weapon_type())
+	if not trigger.has_weapon_equiped():
+		cause += "desarmado com " + habilidade.get_nome()
+		habEffect = habilidade.get_effect()
 		
 		if target.hasDefense():
+			
 			# Bateu em alguém com armadura de mãos limpas
-			#statistic_dano_recebido.agent = "self"
 			agent = "self"
-			#trigger.try_apply_effect(statistic_dano_recebido,[-1,0,0,0])
-			#SystemBattle.apply_effect_on(statistic_dano_recebido,[-1,0,0,0],trigger)
 			SystemBattle.apply_effect_on(MetricasDeEstatisticas.createMetricDanoRecebido(cause,agent,null,false),[-1,0,0,0],trigger)
 		else:
 			# Bateu em alguém sem armadura de mãos limpas
-			var effect = trigger.status.get_effect()
+			var effect = StatusInterface.get_effect(trigger.status.general_status)
 			
 			for id in effect.size():
 				effect_result.append(effect[id]+habEffect[id])
 			
-			#statistic_dano_causado.value = effect_result[0]
-			value = effect_result[0]
-			#statistic_dano_causado.agent = agent_name
+			value = trigger.get_effect_aplicable(effect_result)
 			agent = agent_name
 			trigger.update_statistic(MetricasDeEstatisticas.createMetricDanoCausado(cause,agent,value,false))
-			#trigger.update_statistic(statistic_dano_causado)
 			
-			#statistic_dano_recebido.agent = trigger.type.nome
 			agent = trigger.type.nome
-			#SystemBattle.apply_effect_on(statistic_dano_recebido,effect_result,target)
 			SystemBattle.apply_effect_on(MetricasDeEstatisticas.createMetricDanoRecebido(cause,agent,null,false),effect_result,target)
 	else:
-		#statistic_text += "armado com " +weapon.type.nome
-		cause += "armado com " +weapon.type.nome
-		if habilidade.requireItemOnHand():
-			#statistic_text += " sem habilidade"
-			cause += " sem habilidade"
-			habEffect = []
-			habEffect.resize(habilidade.get_effect().size())
-			habEffect.fill(0)
-		else:
-			#statistic_text += " com " + habilidade.get_nome()
-			cause += " com " + habilidade.get_nome()
-			habEffect = habilidade.get_effect()
+		cause += "armado com " + trigger.get_weapon_name() + " com " + habilidade.get_nome()
+		habEffect = habilidade.get_effect(true)
 		
-		#statistic_dano_causado.cause = statistic_text
-		#statistic_dano_recebido.cause = statistic_text
-		#statistic_eliminacao.cause = statistic_text
+		var itens_conflict : Dictionary = SystemBattle.get_reduction_effect_by_item_hardness(trigger,target)
+		trigger.apply_damage_on_weapon(itens_conflict["damage_on_weapon"])
 		
-		var reduction : float = target.get_reduction_effect_by_item_hardness(weapon)
-		
-		var effect :Array = trigger.status.get_effect()
+		var reduction : float = itens_conflict["effect_reduction"]
+		var effect :Array = StatusInterface.get_effect(trigger.status.general_status)
 		for id in effect.size():
 			effect[id] = effect[id]*(1-reduction)
 		
 		for id in effect.size():
 			effect_result.append(effect[id]+habEffect[id])
 		
-		#statistic_dano_causado.value = weapon.get_effect_final(effect_result)[0]
-		value = weapon.get_effect_final(effect_result)[0]
-		#statistic_dano_causado.agent = target.type.nome
-		agent = target.type.nome
-		#trigger.update_statistic(statistic_dano_causado)
+		value = trigger.get_effect_aplicable(effect_result)
+		agent = agent_name
 		trigger.update_statistic(MetricasDeEstatisticas.createMetricDanoCausado(cause,agent,value,false))
 		
-		#statistic_dano_recebido.agent = trigger.type.nome
 		agent = trigger.type.nome
-		#weapon.useOn(statistic_dano_recebido,target,effect_result)
-		weapon.useOn(MetricasDeEstatisticas.createMetricDanoRecebido(cause,agent,null,false),target,effect_result)
-
+		trigger.try_use_item_on_target(MetricasDeEstatisticas.createMetricDanoRecebido(cause,agent,null,false),target,effect_result)
 	if target == null:
 		value = effect_result[0]
-		#statistic_eliminacao.value = effect_result[0]
 		agent = agent_name
-		#statistic_eliminacao.agent = agent_name
-		#trigger.update_statistic(statistic_eliminacao)
 		trigger.update_statistic(MetricasDeEstatisticas.createMetricEliminacoes(cause,agent,value,false))
 		#aplicar respingos de sange ou residuos da batalha no visual de quem sobreviver
 
 static func apply_effect_on(statistics,effect,target):
 	var trgt = target.get_status_class()
-	trgt.applyEffect(statistics,effect)
+	StatusInterface.applyEffect(statistics,effect,trgt)
 
 static func get_piece_armor_defense_percent(effect_reduction:float,def_value:float,piece):
 	return ((effect_reduction*piece) + def_value)/(piece+1)
+
+static func get_reduction_effect_by_item_hardness(trigger,target):
+	if target is Entity:
+		return SystemBattle.get_reduction_effect_by_item_hardness_on_entity(trigger,target)
+	elif target is Placeable:
+		return SystemBattle.get_reduction_effect_by_item_hardness_on_placeable(target.type,trigger.get_weapon_type())
+
+static func get_reduction_effect_by_item_hardness_on_entity(trigger,target):
+	var effect_reduction : float = 0
+	var itemHardness = RUseable.findRelation(trigger.get_weapon_type()).on_item
+	var amorPieces = target.get_hardeness_armor_pieces()
+	var damage_on_weapon = [0,0,0,0]
+	
+	for piece in amorPieces.size():
+		var rdif = amorPieces[piece] - itemHardness
+		if rdif >= 5:
+			damage_on_weapon[0] += (-1 + (-1)*(rdif/2))
+			effect_reduction = SystemBattle.get_piece_armor_defense_percent(effect_reduction,1.0*target.get_defense_amor_value(piece),piece)
+		elif rdif >= 0:
+			damage_on_weapon[0] += (-1)
+			target.apply_damage_on_armor([-1,0,0,0],piece)
+			effect_reduction = SystemBattle.get_piece_armor_defense_percent(effect_reduction,(1.0/(1+rdif))*target.get_defense_amor_value(piece),piece)
+		else:
+			target.apply_damage_on_armor([-1 + (rdif/2),0,0,0],piece)
+			effect_reduction = SystemBattle.get_piece_armor_defense_percent(effect_reduction,(1/abs(rdif))*target.get_defense_amor_value(piece),piece)
+	
+	return {"effect_reduction":effect_reduction,"damage_on_weapon":damage_on_weapon}
+
+static func  get_reduction_effect_by_item_hardness_on_placeable(target_type,item_type):
+	var effect_reduction : float = 1
+	var damage_on_weapon = [0,0,0,0]
+	var selfHardness = RUseable.findRelation(target_type).on_item
+	var itemHardness = RUseable.findRelation(item_type).on_placeable
+	
+	var rdif = selfHardness - itemHardness
+	
+	if rdif > 0:
+		damage_on_weapon[0] = -1 + (-1)*(rdif/2)
+	else:
+		effect_reduction = 0
+		damage_on_weapon[0] = -1 
+	return {"effect_reduction":effect_reduction,"damage_on_weapon":damage_on_weapon}

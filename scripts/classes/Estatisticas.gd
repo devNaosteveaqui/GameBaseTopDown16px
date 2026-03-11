@@ -300,9 +300,9 @@ static func createItemMetric(metric,item=null):
 	return {
 		'metric':metric,
 		'metric_class':Estatisticas.ESTATISTICAS_CLASS.ITENS,
-		'cause':item.get_class_statistic() if item!=null else null,
-		'value':item.get_quantity() if item!=null else null,
-		'agent':item.get_item_nome() if item!=null else null
+		'cause':ItemInterface.get_class_statistic(item) if item!=null else null,
+		'value':ItemInterface.get_quantity(item) if item!=null else null,
+		'agent':ItemInterface.get_item_nome(item) if item!=null else null
 	}
 static func createCombateMetric(metric,args={'cause':null,'value':null,'agent':null}):
 	return {

@@ -14,6 +14,10 @@ const RELATIONS = [
 	{
 		'source' : Itens.BLOCK_GREENSLIME,
 		'placeable' : Placeables.BLOCK_GREENSLIME
+	},
+	{
+		'source' : Itens.MUDA_DE_ARVORE,
+		'placeable' : Placeables.MUDA_DE_ARVORE
 	}
 ]
 

@@ -23,7 +23,7 @@ var minimal_chance_to_states : Dictionary = {
 }
 var detect_area_2d : Area2D
 var last_dir : Vector2 = Vector2(0,0)
-var can_process : bool = false
+var can_process_state : bool = false
 
 func _ready() -> void:
 	add_to_group(GameConfig.GROUP_STATEMACHINE)
@@ -42,7 +42,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	var args = _create_args()
-	if can_process:
+	if can_process_state:
 		_process_state(delta,args)
 		_process_change_state_delay()
 	decay_can_process_delay()
@@ -279,8 +279,8 @@ func _check_dead() -> STATES:
 func move_character(args:Dictionary=_create_args()):
 	args.body.walk_to(Vector2(args.x,args.y))
 
-func call_skill(skill,target):
-	body.call_skill(skill,target)
+func call_skill(skill,target_selected):
+	body.call_skill(skill,target_selected)
 
 @warning_ignore("unused_parameter")
 func set_animation(animation_name:String):
@@ -364,6 +364,6 @@ static func sort_execute_states_machine():
 			var machine : SMScript = group_of_nodes.pick_random()
 			if machine.can_process_delay < 1:
 				machine.reset_can_process_delay()
-				machine.can_process = !machine.can_process
-				if machine.can_process:
+				machine.can_process_state = !machine.can_process_state
+				if machine.can_process_state:
 					machine.add_to_group(GameConfig.GROUP_ENTITY_TO_UPDATE)

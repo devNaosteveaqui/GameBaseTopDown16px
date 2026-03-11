@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://b23vit20hji4u"]
+
+[ext_resource type="Script" uid="uid://eixvp16nyf3q" path="res://modInterface/npc_interface.gd" id="1_dsg11"]
+[ext_resource type="Script" uid="uid://cg4peh2qv2cn1" path="res://modInterface/npcs.gd" id="2_e30vb"]
+[ext_resource type="Script" uid="uid://di6wnmo5asoo4" path="res://modInterface/itens.gd" id="3_5jicw"]
+
+[node name="ListInterface" type="Control" node_paths=PackedStringArray("list_container", "npcs_interface", "itens_interface")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dsg11")
+list_container = NodePath("ScrollContainer/GridContainer")
+npcs_interface = NodePath("Npcs")
+itens_interface = NodePath("Itens")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(800, 480)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+columns = 5
+
+[node name="Npcs" type="Node" parent="."]
+script = ExtResource("2_e30vb")
+
+[node name="Itens" type="Node" parent="."]
+script = ExtResource("3_5jicw")

@@ -61,7 +61,7 @@ var action_on_self : bool
 var nome : String
 
 static func create_entity(entity_type,isPlayer:bool):
-	var e : Entity= load("res://scenes/entities/Entity.tscn").instantiate()
+	var e : Entity= Entities.OBJECT_ENTITY.instantiate()
 	e.habilidades = SistemaHabilidades.new()
 	e.status_social = SocialStatus.new()
 	e.indiomas = SistemaIndiomas.new()
@@ -76,8 +76,8 @@ static func create_entity(entity_type,isPlayer:bool):
 		if drops != null:
 			drops = drops.drop_p
 			for d in drops:
-				var item : Item = Item.create_item(d[1])
-				item.set_quantity(d[0])
+				var item = ItemInterface.create_data_from_type(d[1],e)
+				ItemInterface.set_quantity(item,d[0])
 				e.inventory.store_item(item,-3)#"spawnStorage"
 		var state_machine : SMScript = SMScript.new()
 		e.add_child(state_machine)
@@ -129,7 +129,7 @@ func _on_area_2d_3_body_exited(body: Node2D) -> void:
 			#active_collision_shape()
 
 func initStatus():
-	status = Status.create_status(inventory,type)
+	status = Status.create_status(type)
 	status.connect("statusIsZero",status_is_zero)
 	status.connect("statusLoss",status_loss)
 	status.connect("statusChange",status_change)
@@ -140,7 +140,8 @@ func set_entity_type(entity_type):
 	set_shadow(entity_type.shadow)
 	type = entity_type
 func set_animation(animation):
-	sprite.sprite_frames = load("res://resources/entities/"+animation)
+	sprite.sprite_frames = animation
+	#sprite.sprite_frames = load("res://resources/entities/"+animation)
 	sprite.play("default")
 func set_shadow(shadow_texture):
 	shadow.texture = load("res://resources/entities/"+shadow_texture)
@@ -168,23 +169,6 @@ func set_position_on_world(x,y):
 
 func get_direction():
 	return raycast.target_position/range_action
-func get_reduction_effect_by_item_hardness(item):
-	var effect_reduction : float = 0
-	var itemHardness = RUseable.findRelation(item.type).on_item
-	var amorPieces = inventory.get_hardeness_amor_pieces()
-	for piece in amorPieces.size():
-		var rdif = amorPieces[piece] - itemHardness
-		if rdif >= 5:
-			item.try_apply_effect([-1 + (-1)*(rdif/2),0,0,0])
-			effect_reduction = SystemBattle.get_piece_armor_defense_percent(effect_reduction,1.0*inventory.get_armor_defense_value(piece,0),piece)
-		elif rdif >= 0:
-			item.try_apply_effect([-1,0,0,0])
-			inventory.damageArmor([-1,0,0,0],piece)
-			effect_reduction = SystemBattle.get_piece_armor_defense_percent(effect_reduction,(1.0/(1+rdif))*inventory.get_armor_defense_value(piece,0),piece)
-		else:
-			inventory.damageArmor([-1 + (rdif/2),0,0,0],piece)
-			effect_reduction = SystemBattle.get_piece_armor_defense_percent(effect_reduction,(1/abs(rdif))*inventory.get_armor_defense_value(piece,0),piece)
-	return effect_reduction
 func get_position_on_eye():
 	return position + raycast.target_position
 func get_sequence():
@@ -216,11 +200,25 @@ func get_area_detect():
 	return area_detect
 func get_habilitys():
 	return habilidades.lista
-
+func get_weapon_name():
+	return inventory.get_principal_item_name()
+func get_effect_aplicable(effect_aplicable:Array):
+	if has_weapon_equiped():
+		return ItemInterface.get_effect_final(inventory.get_principal_item(),effect_aplicable)[0]
+	return effect_aplicable[0]
+func get_weapon_type():
+	var item = inventory.get_principal_item()
+	if item != null:
+		return inventory.get_principal_item().type
+	else:
+		return null
+func get_hardeness_armor_pieces():
+	return inventory.get_hardeness_amor_pieces()
+func get_defense_amor_value(piece):
+	return inventory.get_armor_defense_value(piece,0)
 
 func update_statistic(statistic_metric):
 	estatisticas.update_statistic(statistic_metric)
-
 func update_velocity():
 	self.velocity = (get_speed()*movimentDirection)*inMoviment
 func update_animation():
@@ -244,7 +242,7 @@ func update_animation_particle():
 		particles.play("default")
 		particles.hide()
 func update_lifebar():
-	lifebar.size.x = 20.0*(status.get_life_state())
+	lifebar.size.x = 20.0*(StatusInterface.get_life_state(status.general_status))
 #
 #func update_entity():
 	#if regen_ativated:
@@ -293,14 +291,15 @@ func try_use_item():
 	if onSelf:
 		target = self
 	
-	var slotIdx = inventory.getItemConsumableEquipedSlotIdx()
-	if slotIdx != -1:
-		if target != null:
-			inventory.useConsumable(slotIdx,target)
+	if target == null:
+		return
 	
-	slotIdx = inventory.getItemContainerEquipedSlotIdx()
+	var slotIdx = inventory.get_useable_equiped_slot_idx()
 	if slotIdx != -1:
-		inventory.useContainer(slotIdx,target)
+		inventory.use_item_usable(slotIdx,target)
+
+func try_use_item_on_target(statistics,target,effect_result):
+	inventory.get_principal_item().use_on(statistics,target,effect_result)
 
 func has_entity_nearby() -> bool:
 	#var targets = area_detect.get_overlapping_bodies()
@@ -340,9 +339,12 @@ func has_targeted():
 func has_status_to_use_hability(hab:Habilidade):
 	var hab_consum = hab.get_consum()
 	for s in hab_consum.size():
-		if !status.has_status_minimal_value(s,hab_consum[s]):
+		if !StatusInterface.has_status_minimal_value(status.general_status,s,hab_consum[s]):
 			return false
 	return true
+
+func has_weapon_equiped():
+	return inventory.has_principal_item()
 
 func call_sequence(sequence=get_sequence()):
 	var moviment = Movimentos.get_moviment_sequence_result(sequence)
@@ -404,6 +406,12 @@ func apply_skill(skill):
 		if target is Entity || target is Placeable:
 			call_skill(skill,target)
 
+func apply_damage_on_weapon(damage_on_weapon):
+	inventory.get_principal_item().try_apply_effect(damage_on_weapon)
+
+func apply_damage_on_armor(damage_on_armor,piece):
+	inventory.damageArmor(damage_on_armor,piece)
+
 func knowHabilidade(hab_name,flag_verify_lvl:bool = false,lvl_min:int =1):
 	var condition : bool = habilidades.hasHabilidade(hab_name)
 	if flag_verify_lvl and condition:
@@ -415,12 +423,12 @@ func init_regen(sts):
 		status.set_regen_flag_active(sts)
 		if regen_timer.time_left == 0:
 			reset_regen_timer()
-			regen_timer.timeout.connect(status.activeRegen)
+			regen_timer.timeout.connect(StatusInterface.apply_regen.bind(status))
 
 func stopRegen(sts):
 	if regen_timer.time_left > 0:
 		status.set_regen_flag_deactive(sts)
-		if status.is_all_regen_deactive():
+		if StatusInterface.is_all_regen_deactive(status.general_status):
 			regen_timer.stop()
 
 func learn_basics_from_type(entity_type):
@@ -563,22 +571,19 @@ func collect(item):
 		drop(item)
 
 func drop(item):
-	item.dropOnGround(position)
+	item._drop_on_ground(position)
 	get_parent().add_child(item)
 
 func dropAll(itens):
 	for i in itens.size():
-		if itens[i] != null:
-			drop(itens[i])
-#func active_action():
-	#hitting = true
-	#characterStoped()
-
+		var item = itens[i]
+		if item is Dictionary:
+			item = ItemInterface.drop_item(item)
+		if item != null:
+			drop(item)
 
 func placeBlock():
 	GameConfig.place_on_world(inventory.getItemPlaceable())
-#Aplica Habilidades Fisicas que usam de sequencia de movimentos para ser executada
-
 
 func interact():
 	var interactable = raycast.get_collider()
@@ -620,16 +625,16 @@ func status_is_zero(sts):
 			if self.is_in_group(GameConfig.GROUP_ENTITY_PLAYER):
 				death()
 			#death()
-		Status.STATUS.ENERGIA_FISICA:
+		StatusInterface.STATUS.ENERGIA_FISICA:
 			init_regen(sts)
 
 func status_loss(sts):
-	if sts == Status.STATUS.VIDA:
+	if sts == StatusInterface.STATUS.VIDA:
 		hit()
 	init_regen(sts)
 
 func status_change(sts):
-	if sts == Status.STATUS.VIDA:
+	if sts == StatusInterface.STATUS.VIDA:
 		update_lifebar()
 
 func status_is_full(sts):

@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://b6qkhe5ja27i7"]
+[gd_scene load_steps=7 format=3 uid="uid://b6qkhe5ja27i7"]
 
 [ext_resource type="PackedScene" uid="uid://b81svvtytywh6" path="res://scenes/worldmap/TileMap.tscn" id="1_05yku"]
 [ext_resource type="Script" uid="uid://bvf2s6ebr5riw" path="res://scripts/worldmap/GameMap.gd" id="1_7033p"]
+[ext_resource type="Script" uid="uid://yanet1dyuxjv" path="res://scripts/classes/StateMachinePlaceable.gd" id="3_avfks"]
 [ext_resource type="PackedScene" uid="uid://box05syemx16a" path="res://scenes/interfaces/Inventario.tscn" id="3_oog6s"]
 [ext_resource type="Script" uid="uid://cwonpqyf6iyt1" path="res://scripts/interfaces/DebbugText.gd" id="4_p68ci"]
 [ext_resource type="Script" uid="uid://dtcnse4kmwud6" path="res://scripts/interfaces/StatisticsInterface.gd" id="5_4sb28"]
@@ -16,6 +17,9 @@ gameDebug = NodePath("CanvasLayer/UI/Debug")
 estatisticas = NodePath("CanvasLayer/UI/StatisticsWindow")
 
 [node name="TileMap" parent="." instance=ExtResource("1_05yku")]
+
+[node name="SMP" type="Node" parent="TileMap"]
+script = ExtResource("3_avfks")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -56,6 +60,9 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="Rendering" type="Label" parent="CanvasLayer/UI/Debug"]
+layout_mode = 2
+
+[node name="OBS" type="Label" parent="CanvasLayer/UI/Debug"]
 layout_mode = 2
 
 [node name="Inventario" parent="CanvasLayer/UI" instance=ExtResource("3_oog6s")]

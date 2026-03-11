@@ -23,6 +23,12 @@ const RELATIONS = [
 		]
 	},
 	{
+		'result' : {'x1':Itens.CABO_MADEIRA},
+		'materials' : [
+			{'i0x1':Itens.GALHO_GRANDE}
+		]
+	},
+	{
 		'result' : {'x4':Itens.GRAVETO},
 		'materials' : [
 			{'i0x1':Itens.TABUA}
@@ -38,6 +44,12 @@ const RELATIONS = [
 		'result' : {'x2':Itens.CABECA_MACHADO_MADEIRA},
 		'materials' : [
 			{'i0x1':Itens.TABUA}
+		]
+	},
+	{
+		'result' : {'x1':Itens.CABECA_MACHADO_MADEIRA},
+		'materials' : [
+			{'i0x1':Itens.LASCA_DE_MADEIRA}
 		]
 	},
 	{

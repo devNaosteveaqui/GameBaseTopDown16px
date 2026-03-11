@@ -7,6 +7,10 @@ enum OBJECT_TYPE {ENTITY,ITEM,SPAWN_AREA,HABILITY,PLACEABLE}
 const PATH_ATRIBUTE_CLASS = "res://scripts/classes/Atributos.gd"
 const PATH_STATUS_CLASS = "res://scripts/classes/Status.gd"
 const PATH_TERRAIN_GENERATE_CLASS = "res://scripts/classes/TerrainGenerate.gd"
+const PATH_RESOURCE_ANIMATION_ENTITY = "res://resources/entities/"
+const PATH_RESOURCE_ANIMATION_PLACEABLE = "res://resources/placeable/animation/"
+const PATH_RESOURCE_SHAPE_PLACEABLE = "res://resources/placeable/shape/"
+const PATH_RESOURCE_INTERFACE = "res://resources/interface/"
 
 # Tamanho do mapa em Tiles
 const MAP_WIDTH = 256
@@ -25,6 +29,7 @@ const GROUP_SPAWNER = "spawner"
 const GROUP_RAYCAST = "raycast"
 const GROUP_INTERACTABLE = "interactable"
 const GROUP_STATEMACHINE = "state_machine"
+const GROUP_GROWTH = "placeable_growth"
 
 
 var WorldEntitys
@@ -35,6 +40,8 @@ var Debug_View
 var Interface_Statistics
 
 var on_interface_interaction : bool = false
+
+var save_data : Dictionary
 
 func _physics_process(delta: float) -> void:
 	SMScript.sort_execute_states_machine()

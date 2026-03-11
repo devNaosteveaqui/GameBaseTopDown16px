@@ -9,10 +9,11 @@ var monitored_nodes_group : String
 func set_monitored_area(pos:Vector2,size:Vector2):
 	monitored_area = Rect2(pos,size)
 func get_monitored_area():
-	var area : Rect2 = Rect2(Vector2(0,0),get_child(0).rect.size)
-	area.position.x = self.position.x + get_child(0).rect.position.x
-	area.position.y = self.position.y + get_child(0).rect.position.y
-	return area
+	#var area : Rect2 = Rect2(Vector2(0,0),get_child(0).rect.size)
+	#area.position.x = self.position.x + get_child(0).rect.position.x
+	#area.position.y = self.position.y + get_child(0).rect.position.y
+	#return area
+	return monitored_area
 func desability_node(node):
 	node.set_process(false)
 	node.set_physics_process(false)

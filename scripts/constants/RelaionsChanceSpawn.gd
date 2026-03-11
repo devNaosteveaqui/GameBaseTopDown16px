@@ -12,6 +12,8 @@ const RELATIONS = [
 	{
 		'placeable' : Placeables.ROCHA,
 		'tile' : {
+			TerrainGenerate.TILE_TYPE.GRASS : 0.1,
+			TerrainGenerate.TILE_TYPE.DIRT : 0.5,
 			TerrainGenerate.TILE_TYPE.ROCK : 0.9
 		}
 	}

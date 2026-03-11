@@ -2,6 +2,8 @@ extends Node
 
 class_name RDrop
 
+enum SOURCE_SIZE {SMALL,MEDIUM,BIG,UNIQ,NOSIZE}
+
 const RELATIONS = [
 	{
 		'source' : Placeables.TRONCO,
@@ -22,7 +24,7 @@ const RELATIONS = [
 		'drop' : [[5,Itens.TRONCO]],
 		'drop_by_stage' : {
 			'flag_all' : false,
-			'drop_hit' : [[1,Itens.LASCA_DE_MADEIRA]]
+			'drop_hit' : [[1,Itens.LASCA_DE_MADEIRA],[5,Itens.FOLHA_DE_ARVORE],[3,Itens.GALHO_FRAGIL],[1,Itens.GALHO_GRANDE],[1,Itens.MUDA_DE_ARVORE]]
 		}
 	},
 	{
@@ -61,6 +63,9 @@ const RELATIONS = [
 			'flag_all' : false
 		}
 	}
+]
+const RELATIONS_CHANCE = [
+	
 ]
 static func findRelation(source):
 	if source.size() < 1:

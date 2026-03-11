@@ -17,6 +17,21 @@ const ACESSORIO_3 : int = 9
 const PES : int = 10
 const ACESSORIO_4 : int = 11
 
+const EMPTY_SLOT_PLACEHOLDER = {
+	Inventory.HEAD : GameConfig.PATH_RESOURCE_INTERFACE + "head_slot_symbol.png",
+	Inventory.TORSO : GameConfig.PATH_RESOURCE_INTERFACE + "chest_slot_symbol.png",
+	Inventory.PERNAS : GameConfig.PATH_RESOURCE_INTERFACE + "leg_slot_symbol.png",
+	Inventory.PES : GameConfig.PATH_RESOURCE_INTERFACE + "foot_slot_symbol.png",
+	Inventory.HAND_L : GameConfig.PATH_RESOURCE_INTERFACE + "hold_slot_symbol.png",
+	Inventory.HAND_R : GameConfig.PATH_RESOURCE_INTERFACE + "hold_slot_symbol.png",
+	Inventory.COSTAS_1 : GameConfig.PATH_RESOURCE_INTERFACE + "finger_slot_symbol.png",
+	Inventory.COSTAS_2 : GameConfig.PATH_RESOURCE_INTERFACE + "finger_slot_symbol.png",
+	Inventory.ACESSORIO_1 : GameConfig.PATH_RESOURCE_INTERFACE + "finger_slot_symbol.png",
+	Inventory.ACESSORIO_2 : GameConfig.PATH_RESOURCE_INTERFACE + "finger_slot_symbol.png",
+	Inventory.ACESSORIO_3 : GameConfig.PATH_RESOURCE_INTERFACE + "finger_slot_symbol.png",
+	Inventory.ACESSORIO_4 : GameConfig.PATH_RESOURCE_INTERFACE + "finger_slot_symbol.png"
+}
+
 var inventory : Array = []
 var equiped : Array = []
 
@@ -28,9 +43,9 @@ func store_item(item,typeStore):
 	var firstSlotNull = -1
 	for slot in inventory.size():
 		if not is_inventory_slot_empty(slot):
-			if inventory[slot].canStack(item):
-				inventory[slot].accumulate(item.get_quantity())
-				inventory[slot].connect("ranout",itemConsumed)
+			if ItemInterface.can_stack_item(inventory[slot].type,item.type):
+				ItemInterface.accumulate(inventory[slot],ItemInterface.get_quantity(item))
+				#inventory[slot].connect("ranout",itemConsumed)
 				emit_signal("inventoryUpdated")
 				emit_signal("item_storaged",Estatisticas.createItemMetric(typeStore,item))
 				return true
@@ -53,10 +68,11 @@ func set_inventory_slot(slot,value):
 
 func unstore_item(storaged_idx):
 	if not is_inventory_slot_empty(storaged_idx):
-		var item = inventory[storaged_idx].decumulate()
-		if inventory[storaged_idx].isStorageZero():
+		ItemInterface.decumulate(inventory[storaged_idx])
+		var item = ItemInterface.drop_item(inventory[storaged_idx],1)
+		if ItemInterface.is_storage_zero(inventory[storaged_idx]):
 			set_inventory_slot(storaged_idx,null)
-			item.disconnect("ranout",itemConsumed)
+			#item.disconnect("ranout",itemConsumed)
 		emit_signal("inventoryUpdated")
 		return item
 	return null
@@ -65,8 +81,8 @@ func consumItem(itemType,qtd):
 	for idx in inventory.size():
 		if not is_inventory_slot_empty(idx):
 			if is_type_item_inventory(idx,itemType):
-				inventory[idx].decumulate(qtd)
-				if inventory[idx].isStorageZero():
+				ItemInterface.decumulate(inventory[idx],qtd)
+				if ItemInterface.is_storage_zero(inventory[idx]):
 					#inventory[idx] = null
 					set_inventory_slot(idx,null)
 				emit_signal("inventoryUpdated")
@@ -85,37 +101,35 @@ func get_quantity_this_item(itemType):
 	for idx in inventory.size():
 		if not is_inventory_slot_empty(idx):
 			if is_type_item_inventory(idx,itemType):
-				return inventory[idx].get_quantity()
+				return ItemInterface.get_quantity(inventory[idx])
 	return 0
 
-func hasThisItemQuantity(itemType,qtd:int):
+func has_this_item_quantity(itemType,qtd:int):
 	for idx in inventory.size():
 		if not is_inventory_slot_empty(idx):
 			if is_type_item_inventory(idx,itemType):
-				return inventory[idx].hasAtLastQuantity(qtd)
+				return ItemInterface.has_at_last_quantity(inventory[idx],qtd)
 	return false
 
-func getItemConsumableEquipedSlotIdx():
-	if not is_equip_slot_empty(HAND_L):
-		if equiped[HAND_L].consumable :
-			return HAND_L
-		if equiped[HAND_L].has_one_slot() and (not equiped[HAND_L].is_empty()):
-			return HAND_L
-	elif not is_equip_slot_empty(HAND_R):
-		if equiped[HAND_R].consumable :
-			return HAND_R
-		if equiped[HAND_R].has_one_slot() and (not equiped[HAND_R].is_empty()):
-			return HAND_R
+func has_principal_item():
+	var handSlot = HAND_L if is_equip_slot_empty(HAND_R) else HAND_R
+	return not is_equip_slot_empty(handSlot)
+
+func get_useable_equiped_slot_idx():
+	var slot = HAND_L
+	if not is_equip_slot_empty(slot):
+		if ItemInterface.is_consumable(equiped[slot].type) or ItemInterface.is_container(equiped[slot].type):
+			return slot
+	slot = HAND_R
+	if not is_equip_slot_empty(slot):
+		if ItemInterface.is_consumable(equiped[slot].type) or ItemInterface.is_container(equiped[slot].type):
+			return slot
 	return -1
 
-func getItemContainerEquipedSlotIdx():
-	if not is_equip_slot_empty(HAND_L):
-		if equiped[HAND_L].canContainItem :
-			return HAND_L
-	elif not is_equip_slot_empty(HAND_R):
-		if equiped[HAND_R].canContainItem :
-			return HAND_R
-	return -1
+func get_principal_item_name():
+	if has_principal_item():
+		return get_principal_item().type.nome
+	return null
 
 func equipItem(storaged_idx):
 	var slotEquipable = -1
@@ -137,7 +151,7 @@ func equipItem(storaged_idx):
 func equipItemAt(storaged_idx,slot_idx):
 	var slotEquipable = -1
 	if not is_inventory_slot_empty(storaged_idx):
-		slotEquipable = isEquipableAtSlot(inventory[storaged_idx].slotEquipable,inventory[storaged_idx],slot_idx)
+		slotEquipable = isEquipableAtSlot(ItemInterface.get_slot_equipable(inventory[storaged_idx]),inventory[storaged_idx],slot_idx)
 	if slotEquipable :
 		var item = unstore_item(storaged_idx)
 		if item != null:
@@ -156,14 +170,14 @@ func searchEquipableSlot(itemSlotsAble,item):
 		for slot in itemSlotsAble:
 			if is_equip_slot_empty(slot):
 				return slot
-			elif equiped[slot].canStack(item):
+			elif ItemInterface.can_stack_item(equiped[slot].type,item.type):
 				return slot
 	return -1
 
 func isEquipableAtSlot(itemSlotsAble,item,slotTarget):
 	if (itemSlotsAble.has(slotTarget) and itemSlotsAble.size() > 0):
 		for slot in itemSlotsAble:
-			return (is_equip_slot_empty(slotTarget) or equiped[slotTarget].canStack(item))
+			return (is_equip_slot_empty(slotTarget) or ItemInterface.can_stack_item(equiped[slotTarget].type,item.type))
 	return false
 
 func is_equip_slot_empty(idx):
@@ -194,7 +208,7 @@ func dropItemEquiped(storaged_idx):
 		set_equiped_slot(storaged_idx,null)
 
 func get_principal_item():
-	var handSlot = HAND_R if is_equip_slot_empty(HAND_R) else HAND_L
+	var handSlot = HAND_R if not is_equip_slot_empty(HAND_R) else HAND_L
 	return equiped[handSlot]
 
 func damageArmor(value,idx):
@@ -210,57 +224,43 @@ func get_hardeness_amor_pieces():
 
 func getItemPlaceable():
 	var item
-	var handSlot = HAND_R if is_equip_slot_empty(HAND_R) else HAND_L
+	var handSlot = HAND_R if not is_equip_slot_empty(HAND_R) else HAND_L
 	if not is_equip_slot_empty(handSlot):
-		if equiped[handSlot].isPlaceable():
-			item = equiped[handSlot].decumulate()
-			if equiped[handSlot].isStorageZero():
+		if ItemInterface.is_placeable(equiped[handSlot].type):
+			ItemInterface.decumulate(equiped[handSlot])
+			var item_type = equiped[handSlot].type
+			if ItemInterface.is_storage_zero(equiped[handSlot]):
 				#equiped[handSlot] = null
 				set_equiped_slot(handSlot,null)
 			emit_signal("inventoryUpdated")
-			item = item.get_placeable()
+			item = ItemInterface.get_placeable(item_type)
 			item.position = get_parent().get_position_on_eye()
 			return item
 	return null
 
-func useContainer(slotIdx,onTarget : Entity):
+func use_item_usable(slotIdx,onTarget):
 	var item : Item = equiped[slotIdx]
-	var itens_extracted = RExtract.findRelation(onTarget.type).extract
-	if itens_extracted != null:
-		item.set_drops(itens_extracted)
-		
-		for item_extracted in itens_extracted:
-			var sprite_container_filled = RContents.findRelation(item.type,item_extracted[1]).sprite
-			if sprite_container_filled != null:
-				item.set_sprite(sprite_container_filled)
-
-func useConsumable(slotIdx,onTarget : Entity):
-	#Lógica de consumir um item consumivel
-	#Aplicar efeitos de uso do item
-	
-	var item : Item = equiped[slotIdx]
-	var stat : Status = onTarget.get_status_class()
-	
-	stat.applyEffect(Estatisticas.createItemMetric(-1),item.get_status_effect())
-	#Remover 1 unidade do item
-	var resto : Item = equiped[slotIdx].decumulate()
-	if equiped[slotIdx].isStorageZero():
-		if resto.type != equiped[slotIdx].type:
-			store_item(resto,Estatisticas.ITENS.EXTRAIDOS)
+	var func_ref : RUseableFunc.FUNCTIONS = RUseableFunc.findRelation(item.type)
+	if func_ref == RUseableFunc.FUNCTIONS.USE_LOQUID_CONTAINER:
+		UseableInterface.use_liquid_container(item,onTarget)
+	elif func_ref == RUseableFunc.FUNCTIONS.USE_CONSUMABLE:
+		UseableInterface.use_consumable(item,onTarget)
+	if ItemInterface.is_storage_zero(item):
 		set_equiped_slot(slotIdx,null)
 
 func get_armor_defense_value(idx,status):
-	var value = equiped[idx].get_defense() #PROBLEM TO RESOLVE
-	return value[status]
+	if equiped[idx].has_method("get_defense"):
+		var value = equiped[idx].get_defense() #PROBLEM TO RESOLVE
+		return value[status]
+	return 0
 
 func get_armor_defense():
 	var equipedDef = []
 	for e in equiped:
 		if e != null:
-			if e.has_method("isDefensive"):
-				#Precisa verificar caso o item não seja uma vestimenta ou tenha a propriedade
-				if e.isDefensive():
-					equipedDef.append(e)
+			#Precisa verificar caso o item não seja uma vestimenta ou tenha a propriedade
+			if ItemInterface.is_defensive(e.type):
+				equipedDef.append(e)
 	return equipedDef
 
 func get_item_consumable_status():
@@ -268,28 +268,28 @@ func get_item_consumable_status():
 	if is_equip_slot_empty(handSlot):
 		handSlot = HAND_L
 	if not is_equip_slot_empty(handSlot):
-		return equiped[handSlot].get_consum_status()
+		return ItemInterface.get_consum_status(equiped[handSlot])
 	return [0,0,0,0]
 
 func get_item_inventory_info(index):
 	var item = inventory[index]
 	var info : String
 	if item != null:
-		info = "Nome : " + item.nome + "\n"
-		info += item.type.desc
+		info = "Nome : " + ItemInterface.get_item_nome(item) + "\n"
+		info += ItemInterface.get_item_desc(item.type)
 	return info
 
 func get_item_equiped_info(index):
 	var item = equiped[index]
 	var info : String
 	if not is_equip_slot_empty(index):
-		info = "Nome : " + item.nome + "\n"
-		info += item.type.desc
+		info = "Nome : " + ItemInterface.get_item_nome(item) + "\n"
+		info += ItemInterface.get_item_desc(item.type)
 	return info
 
 func isWieldableItemEquiped():
-	var hand_l_has = not is_equip_slot_empty(HAND_L) and equiped[HAND_L].isWieldable()
-	var hand_r_has = not is_equip_slot_empty(HAND_R) and equiped[HAND_R].isWieldable()
+	var hand_l_has = not is_equip_slot_empty(HAND_L) and ItemInterface.is_wieldable(equiped[HAND_L].type)
+	var hand_r_has = not is_equip_slot_empty(HAND_R) and ItemInterface.is_wieldable(equiped[HAND_R].type)
 	return  hand_l_has or hand_r_has
 
 func isHandsFree():

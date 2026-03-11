@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Game Base Top Down 16 Px"
+run/main_scene="uid://b6qkhe5ja27i7"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -23,6 +24,7 @@ GameConfig="*res://scripts/constants/autoload/GameConfig.gd"
 window/size/viewport_width=800
 window/size/viewport_height=480
 window/stretch/mode="viewport"
+window/stretch/aspect="expand"
 
 [input]
 

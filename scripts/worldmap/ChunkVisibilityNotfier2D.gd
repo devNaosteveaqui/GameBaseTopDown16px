@@ -39,7 +39,6 @@ func _ready() -> void:
 		
 		cve.rect = Rect2(-enabler_size.x/2,-enabler_size.y/2,enabler_size.x,enabler_size.y)
 		
-		
 		cve.screen_exited.connect(chunk_discharge.bind(cn,-1))
 		cve.screen_entered.connect(chunk_charge.bind(cn,-1))
 		#var cs = CollisionShape2D.new()
@@ -137,7 +136,8 @@ func get_chunk_groups(pos:Vector2):
 				return [area.markers_notifiers[c].monitored_nodes_group,monitored_area]
 
 func vector_in_area(pos:Vector2,rect:Rect2):
-	var r : bool = false
-	r = rect.position.x - pos.x <= 0 && pos.x < rect.position.x + rect.size.x
-	r = r && rect.position.y - pos.y <= 0 && pos.y < rect.position.y + rect.size.y
-	return r
+	#var r : bool = false
+	#r = rect.position.x - pos.x <= 0 && pos.x < rect.position.x + rect.size.x
+	#r = r && rect.position.y - pos.y <= 0 && pos.y < rect.position.y + rect.size.y
+	#return r
+	return rect.has_point(pos)

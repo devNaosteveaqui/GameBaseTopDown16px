@@ -14,16 +14,40 @@ signal map_generated
 var world_selected = WorldsConfig.WORLD0
 var generator = TerrainGenerate.new()
 
+var map_in_generate : Dictionary
+var map_in_generating : bool = false
+
 func _ready():
 	GameConfig.WorldEntitys = $DinamicsObjects
 	generate_world()
-	
 	#render(map,Rect2(-32,-32,64,64),map_resources)
-	
 	#spawn_on_map(Spawner.createSpawner(Entities.GREENSLIME,self), 0,0)
 	var player : Entity = PlayerClass.create_player(GameConfig.Interface_Inventory,GameConfig.Interface_SkillCall)
 	spawn_on_map(player,0,0)
-	
+
+var count_max
+var frames_interval = 6
+var generate_rate = frames_interval
+func _physics_process(delta: float) -> void:
+	if map_in_generating:
+		if generate_rate < 1:
+			generate_rate = frames_interval
+		if generate_rate == frames_interval:
+			var count = count_max;
+			for i in map_in_generate.size():
+				if count < 1:
+					break
+				var key = map_in_generate.keys().pick_random()
+				if map_in_generate[key].has("placeable_type"):
+					spawn_placeable(map_in_generate[key]["placeable_type"],map_in_generate[key]["placeable_pos"])
+				#print("Verificando se tem spawner ",map_in_generate[key])
+				if map_in_generate[key].has("spawner_name"):
+					spawn_spawner(map_in_generate[key]["spawner_name"],map_in_generate[key]["spawner_pos"])
+				map_in_generate.erase(key)
+				count = count - 1
+		generate_rate = generate_rate - 1
+		map_in_generating = !(map_in_generate.size() < 1)
+
 func render(tiles:Array,area:Rect2,placeables:Array=map_resources):
 	@warning_ignore("integer_division")
 	var p_start = (area.position.x + Game.MAP_WIDTH/2) + (area.position.y + Game.MAP_HEIGTH/2)*Game.MAP_WIDTH
@@ -31,55 +55,82 @@ func render(tiles:Array,area:Rect2,placeables:Array=map_resources):
 	var pos : Vector2
 	var atlas_coord : Vector2i
 	var p = -1
-	var ktmp = 0
 	var area_size = area.size.x*area.size.y
 	var init_tile = tiles[p_start]
 	var last_tile = tiles[p_end]
 	
-	#var only_one : bool = false
-	
+	var p_offset = ( area.position.x + Game.MAP_WIDTH/2)  + ( (area.position.y ) + Game.MAP_HEIGTH/2)*Game.MAP_WIDTH
+	var p_at
 	#SPAWN DOS TILES
 	for i in area_size:
+		p_at = (int(i) % int(area.size.x)) + (int(i)/int(area.size.y))*Game.MAP_WIDTH
 		@warning_ignore("integer_division")
-		p =( (area.position.x + (int(i) % int(area.size.x)) ) + Game.MAP_WIDTH/2)  + ( (area.position.y + int(i)/int(area.size.y) ) + Game.MAP_HEIGTH/2)*Game.MAP_WIDTH
+		p = p_offset + p_at #( (area.position.x + (int(i) % int(area.size.x)) ) + Game.MAP_WIDTH/2)  + ( (area.position.y + int(i)/int(area.size.y) ) + Game.MAP_HEIGTH/2)*Game.MAP_WIDTH
 		
 		pos.x = tiles[p].x
 		pos.y = tiles[p].y
-		
 		for layer in 4:
 			atlas_coord.x = tiles[p].atlas[layer].x
 			atlas_coord.y = tiles[p].atlas[layer].y
 			world_map[layer].set_cell(pos,tiles[p].ids[layer],atlas_coord,tiles[p].alternative_id[layer])
-			
-	
+		
+	#print("Init Tile : ",init_tile.x, ", ",init_tile.y)
+	#print("Last Tile : ",last_tile.x, ", ",last_tile.y)
 	
 	# SPAWN DOS PLACEABLES
+	#print(placeables.size())
+	var farway_pos
 	if placeables.size() > 0:
 		for i in area_size:
+			p_at = (int(i) % int(area.size.x)) + (int(i)/int(area.size.y))*Game.MAP_WIDTH
 			@warning_ignore("integer_division")
-			p =( (area.position.x + (int(i) % int(area.size.x)) ) + Game.MAP_WIDTH/2)  + ( (area.position.y + int(i)/int(area.size.y) ) + Game.MAP_HEIGTH/2)*Game.MAP_WIDTH
+			p = p_offset + p_at
 			if placeables[p] != null && ((placeables[p].x >= init_tile.x && placeables[p].x <= last_tile.x)&&(placeables[p].y >= init_tile.y && placeables[p].y <= last_tile.y)):
+				if farway_pos == null:
+					farway_pos = Vector2(placeables[p].x,placeables[p].y)
+				elif farway_pos.x < placeables[p].x and farway_pos.y < placeables[p].y:
+					farway_pos = Vector2(placeables[p].x,placeables[p].y)
 				#if only_one :
 					#continue
 				#only_one = true
 				var mod_key = "modk_pr_x"+str(placeables[p].x)+"y"+str(placeables[p].y)
-				if !world_modfiers.keys().has(mod_key):
+				if !world_modfiers.has(mod_key):
 					world_modfiers[mod_key] = true
-					spawn_on_map(Placeable.create_placeable(placeables[p].type), placeables[p].x*32 + 16,placeables[p].y*32 +16)
-					ktmp = ktmp+1
-					#await get_tree().create_timer(0.05).timeout
-	
+					map_in_generate[p_at] = {
+						"id":p_at,
+						"placeable_type":placeables[p].type,
+						"placeable_pos":Vector2(placeables[p].x*32 +16,placeables[p].y*32 +16)#Vector2(placeables[p].x*32 + 16,placeables[p].y*32 +16)
+					}
+					#spawn_placeable(map_in_generate[p_at]["placeable_type"],map_in_generate[p_at]["placeable_pos"])
+	#print("Placeable far way ",farway_pos)
 	# SPAWN SPAWNERS
 	for k in map_spawners.keys():
 		var xy = k.split('_')
-		#if (int(xy[0]) >= init_tile.x and int(xy[0]) <= last_tile.x) and (int(xy[1]) >= init_tile.y and int(xy[1]) <= last_tile.y):
-		if !has_this_object(k):
-			var spawner = Spawner.create_spawner(map_spawners[k],self)
-			spawner.name = k
-			#spawn_on_map(spawner,randi_range(-256,256),randi_range(-256,256))
-			spawn_on_map(spawner,int(xy[0]),int(xy[1]))
-			#await get_tree().create_timer(0.05).timeout
+		#print("Spawner position : ",xy)
+		if (int(xy[0]) >= init_tile.x*32 and int(xy[0]) <= last_tile.x*32) and (int(xy[1]) >= init_tile.y*32 and int(xy[1]) <= last_tile.y*32):
+			if !has_this_object(k):
+				p_at = (int(xy[0]) + int(xy[1]))*Game.MAP_WIDTH
+				if map_in_generate.has(p_at):
+					map_in_generate[p_at]["spawner_name"] = k
+					map_in_generate[p_at]["spawner_pos"] = Vector2(int(xy[0]),int(xy[1]))
+				else:
+					map_in_generate[p_at] = {
+						"id":p_at,
+						"spawner_name": k,
+						"spawner_pos": Vector2(int(xy[0]),int(xy[1]))
+					}
+				#spawn_spawner(map_in_generate[p_at]["spawner_name"],map_in_generate[p_at]["spawner_pos"])
 	
+	count_max = map_in_generate.keys().size()*0.1
+	map_in_generating = true
+
+func spawn_placeable(placeable_type,placeable_pos:Vector2):
+	spawn_on_map(Placeable.create_placeable(placeable_type),placeable_pos.x,placeable_pos.y)
+
+func spawn_spawner(spawner_name,spawner_pos:Vector2):
+	var spawner = Spawner.create_spawner(map_spawners[spawner_name],self)
+	spawner.name = spawner_name
+	spawn_on_map(spawner,spawner_pos.x,spawner_pos.y)
 
 func unrender(tiles:Array,area:Rect2):
 	@warning_ignore("integer_division")
@@ -98,9 +149,10 @@ func generate_world():
 	@warning_ignore("integer_division")
 	generator.generate_floor(self,Game.MAP_WIDTH,Game.MAP_HEIGTH,-Game.MAP_WIDTH/2,-Game.MAP_HEIGTH/2)
 	generator.generate_natural_spawners(self)
-	generator.generate_nature(self)
+	generator.generate_nature(self,0.45)
 
 static func spawn_on_map(e,x,y):
+	
 	e.set_position_on_world(x,y)
 	spawn_on_world(e)
 

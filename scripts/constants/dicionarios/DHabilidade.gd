@@ -14,6 +14,7 @@ const REPETIDO_MOVIMENTOS = "Repetido movimentos"
 
 const SOCO = {
 	'nome' : "Soco",
+	'object_type':SystemDictionary.OBJECS_TYPE.HABILIDADE,
 	'type' : PHYSIC_SKILL,
 	'born_effect' : [-1,0,0,0],
 	'born_effect_consum' : [0,-1,0,0],
@@ -25,6 +26,7 @@ const SOCO = {
 }
 const ESGRIMA = {
 	'nome' : "Esgrima",
+	'object_type':SystemDictionary.OBJECS_TYPE.HABILIDADE,
 	'type' : PHYSIC_SKILL,
 	'born_effect' : [-2,0,0,0],
 	'born_effect_consum' : [0,-1,0,0],
@@ -35,6 +37,7 @@ const ESGRIMA = {
 }
 const PANCADA = {
 	'nome' : "Pancada",
+	'object_type':SystemDictionary.OBJECS_TYPE.HABILIDADE,
 	'type' : PHYSIC_SKILL,
 	'born_effect' : [-1,0,0,0],
 	'born_effect_consum' : [0,-1,0,0],
@@ -45,6 +48,7 @@ const PANCADA = {
 }
 const CONTROLE_MAGICO = {
 	'nome' : "Controle Mágico",
+	'object_type':SystemDictionary.OBJECS_TYPE.HABILIDADE,
 	'type' : MAGIC_SKILL,
 	'born_effect' : [0,0,0,0],
 	'born_effect_consum' : [0,0,0,0],
@@ -55,6 +59,7 @@ const CONTROLE_MAGICO = {
 }
 const ESFERA_MAGICA = {
 	'nome' : "Esfera Magica",
+	'object_type':SystemDictionary.OBJECS_TYPE.HABILIDADE,
 	'type' : MAGIC_SKILL,
 	'born_effect' : [-1,0,0,0],
 	'born_effect_consum' : [0,-1,0,0],
@@ -65,6 +70,7 @@ const ESFERA_MAGICA = {
 }
 const COICE = {
 	'nome' : "Coice",
+	'object_type':SystemDictionary.OBJECS_TYPE.HABILIDADE,
 	'type' : PHYSIC_SKILL,
 	'born_effect' : [-1,0,0,0],
 	'born_effect_consum' : [0,-1,0,0],

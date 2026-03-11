@@ -73,6 +73,7 @@ func generate_floor(tilemap:WorldTileMap,width,heigth,offset_x = 0, offset_y = 0
 	tilemap.map = tilesMap
 
 func generate_natural_spawners(tilemap:WorldTileMap):
+	
 	#tilemap.spawn_on_map(Spawner.createSpawner(Entities.GREENSLIME,tilemap),0,0)
 	var natural_spawners : Dictionary = {}
 	var wide_size : int = tilemap.world_selected.wide_spawn_size
@@ -85,8 +86,9 @@ func generate_natural_spawners(tilemap:WorldTileMap):
 	for i in tilemap.world_selected.spawner_count:
 		var posit = str(randi_range(map_limits.xi,map_limits.xf)) + "_" + str(randi_range(map_limits.yi,map_limits.yf))
 		natural_spawners[posit] = RSpawns.sort_spawn().entity
+		#print("generate spawner - ",posit)
 	tilemap.map_spawners = natural_spawners.duplicate(true)
-	
+		
 
 func floor_on_suface(tile):
 	#Set Layer Floor
@@ -117,20 +119,31 @@ func floor_on_suface(tile):
 	else:
 		return TILE_TYPE.MATRIX
 
-func generate_nature(tilemap:WorldTileMap):
+func generate_nature(tilemap:WorldTileMap,density:float):
 	# ERR - A distribuição dos valores parece estar errada
 	var nature_obj = []
 	nature_obj.resize(tilemap.map.size())
+	var count = 0
+	var farway_position = Vector2(tilemap.map[0].x,tilemap.map[0].y)
 	for t in tilemap.map.size():
 		var ftype : TILE_TYPE = floor_on_suface(tilemap.map[t])
 		
 		var possibilitys = RChanceSpawn.findPossibilitysSpawn(ftype)
+		
 		if possibilitys.size() < 1:
 			continue
+		
+		
+		var value_sorted = randf()
 		for p in possibilitys.size():
 			var tile = possibilitys[p].keys()[0]
-			if randf() > possibilitys[0][tile]:
+			value_sorted = value_sorted - possibilitys[p][tile]*density
+			
+			if value_sorted < 0 and nature_obj[t] == null:
+				count = count + 1
+				farway_position = Vector2(tilemap.map[t].x,tilemap.map[t].x) if farway_position.x < tilemap.map[t].x and farway_position.y < tilemap.map[t].y else farway_position
 				nature_obj[t] = {'type':tile,'x':tilemap.map[t].x,'y':tilemap.map[t].y}
+				#ERRO GERAÇÃO
 		#match ftype:
 			#TILE_TYPE.GRASS:
 				#if randi()%10 > 6:
@@ -141,7 +154,7 @@ func generate_nature(tilemap:WorldTileMap):
 					#nature_obj[t] = {'type':Placeables.ROCHA,'x':tilemap.map[t].x,'y':tilemap.map[t].y}
 			#_:
 				#pass
-		
+	#print(nature_obj.size(), " - ", count , " - ", farway_position)
 	tilemap.map_resources = nature_obj.duplicate(true)
 
 @warning_ignore("unused_parameter")

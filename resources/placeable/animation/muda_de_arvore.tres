@@ -1,0 +1,14 @@
+[gd_resource type="SpriteFrames" load_steps=2 format=3 uid="uid://wbgay8t4ccle"]
+
+[ext_resource type="Texture2D" uid="uid://bbecpa3du8i10" path="res://resources/placeable/sprites/sappling.png" id="1_6cyuq"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_6cyuq")
+}],
+"loop": true,
+"name": &"default",
+"speed": 12.0
+}]

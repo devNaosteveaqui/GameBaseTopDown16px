@@ -13,9 +13,9 @@ var log_game : Dictionary
 #func _ready() -> void:
 	#_player_position()
 
-@warning_ignore("unused_parameter")
-func _process(delta: float) -> void:
-	_analytics_info()
+#@warning_ignore("unused_parameter")
+#func _process(delta: float) -> void:
+	#_analytics_info()
 
 func _player_position(x:float=0.0,y:float=0.0):
 	$Coord.text = "Coordinates (x,y) : ( " + str(round(x*100)/100.0) + ", " + str(round(y*100)/100.0) + ")"
@@ -26,6 +26,21 @@ func _analytics_info():
 	data_analysis()
 	show_data()
 	logs.append(log_game.duplicate())
+	if get_log_value("fps") > 59:
+		$OBS.text = "Otimização Perfeita!! DevGame Perfeito!!"
+		$OBS.add_theme_color_override("font_color",Color.GREEN)
+		$OBS.add_theme_color_override("font_outline_color",Color.BLACK)
+		$OBS.add_theme_constant_override("outline_size",2)
+	elif get_log_value("fps") > 30:
+		$OBS.text = "Voltamos para os anos 2010... até que foram bons tempos."
+		$OBS.add_theme_color_override("font_color",Color.DARK_GOLDENROD)
+		$OBS.add_theme_color_override("font_outline_color",Color.BLACK)
+		$OBS.add_theme_constant_override("outline_size",2)
+	else:
+		$OBS.text = "A otimização deve ter sido feita em Malbolge"
+		$OBS.add_theme_color_override("font_color",Color.DARK_RED)
+		$OBS.add_theme_color_override("font_outline_color",Color.BLACK)
+		$OBS.add_theme_constant_override("outline_size",2)
 
 func show_data():
 	FPSAndFrameTime.text = "FPS ( Frame Time | Physics Frame Time ): " + get_log_flag("fps") + str(get_log_value("fps"))
@@ -103,6 +118,11 @@ func define_color_flag(tier:Dictionary):
 	else:
 		return Color.GREEN
 
+func set_label_style(lbl:Label,color:Color):
+	lbl.add_theme_color_override("font_color",color)
+	lbl.add_theme_color_override("font_outline_color",Color.BLACK)
+	lbl.add_theme_constant_override("outline_size",2)
+
 func data_analysis():
 	log_game["flag_count"] = 0
 	var color_flag = Color.WHITE
@@ -112,7 +132,7 @@ func data_analysis():
 	tier = avaluate_condition("physics_frame_time",tier,0.0166,0.0050)
 	color_flag = define_color_flag(tier)
 	
-	FPSAndFrameTime.add_theme_color_override("font_color",color_flag)
+	set_label_style(FPSAndFrameTime,color_flag)
 	color_flag = Color.WHITE
 	tier = {'r':0,'y':0}
 	
@@ -121,7 +141,7 @@ func data_analysis():
 	tier = avaluate_condition("island_count",tier,200,50)
 	color_flag = define_color_flag(tier)
 	
-	Physics.add_theme_color_override("font_color",color_flag)
+	set_label_style(Physics,color_flag)
 	color_flag = Color.WHITE
 	tier = {'r':0,'y':0}
 	
@@ -130,7 +150,7 @@ func data_analysis():
 	tier = avaluate_condition("orphans",tier,100,1)
 	color_flag = define_color_flag(tier)
 	
-	Process.add_theme_color_override("font_color",color_flag)
+	set_label_style(Process,color_flag)
 	color_flag = Color.WHITE
 	tier = {'r':0,'y':0}
 	
@@ -138,6 +158,6 @@ func data_analysis():
 	tier = avaluate_condition("objects_in_frame",tier,2500,1000)
 	color_flag = define_color_flag(tier)
 	
-	Rendering.add_theme_color_override("font_color",color_flag)
+	set_label_style(Rendering,color_flag)
 	color_flag = Color.WHITE
 	tier = {'r':0,'y':0}
