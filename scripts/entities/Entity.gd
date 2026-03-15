@@ -19,6 +19,7 @@ signal deathCharacter
 @export var shadow : Sprite2D
 @export var text_action_execution : Label
 
+
 var direction_angle : float = 0
 var range_action : int = 24
 var inMoviment : int = 0
@@ -42,9 +43,18 @@ var movimentDirection : Vector2
 var chunk_limits : Rect2
 var bodys_on_detect : Array
 var bodys_on_range_attack : Array
+var sequence_click : Array
 
 var last_interactable
 
+var MPDComp : MovimentPatternDetectionComponent
+var AnimationComp : AnimationComponent
+var DetectionComp : DetectionComponent
+var HealthBarComp : HealthBarComponent
+var InteractionComp : InteractionComponent
+var JumpComp : JumpComponent
+var MovimentComp : MovimentComponent
+var TargetingComp : TargetingComponent
 var status_social : SocialStatus # a ser implementado
 var status : Status
 var type
@@ -55,13 +65,20 @@ var visual_system : SistemaVisual
 var onSelf : bool = false
 var calling_skill : bool = false
 
-var sequence_click : Array
 var action_on_self : bool
 
 var nome : String
 
 static func create_entity(entity_type,isPlayer:bool):
 	var e : Entity= Entities.OBJECT_ENTITY.instantiate()
+	e.MPDComp = MovimentPatternDetectionComponent.new(e)
+	e.AnimationComp = AnimationComponent.new(e)
+	e.DetectionComp = DetectionComponent.new(e)
+	e.HealthBarComp = HealthBarComponent.new(e)
+	e.InteractionComp = InteractionComponent.new(e)
+	e.JumpComp = JumpComponent.new(e)
+	e.MovimentComp = MovimentComponent.new(e)
+	e.TargetingComp = TargetingComponent.new(e)
 	e.habilidades = SistemaHabilidades.new()
 	e.status_social = SocialStatus.new()
 	e.indiomas = SistemaIndiomas.new()
@@ -84,39 +101,32 @@ static func create_entity(entity_type,isPlayer:bool):
 		state_machine.set_body(e)
 	e.learn_basics_from_type(entity_type)
 	e.initStatus()
+	e.connect_signals()
 	GameConfig.create_object(e)
 	return e
 
 func _ready():
 	add_to_group(GameConfig.GROUP_INTERACTABLE)
 	raycast.target_position = Vector2(0,range_action)
-	moviment_timer.timeout.connect(call_sequence)
+	
 	nextPosition = self.position
 	jump_origin = self.position
-	inventory.item_storaged.connect(update_statistic)
-	area_detect.body_entered.connect(add_body_detected)
-	area_detect.body_exited.connect(remove_body_detected)
-	range_attack.body_entered.connect(add_body_on_range)
-	range_attack.body_exited.connect(remove_body_on_range)
+	
 
 func _process(delta):
-	has_targeted()
+	TargetingComp.has_targeted()
 	if is_crouched:
 		if crouched_cooldown <= 0:
 			lift()
 		crouched_cooldown -= 1
-	update_velocity()
-	update_animation()
-	update_animation_particle()
+	MovimentComp.update_velocity()
+	AnimationComp.update_animation()
+	AnimationComp.update_animation_particle()
 	move_and_slide()
 func _on_animation_looped():
-	if sprite.animation == "hitted":
-		hitted = false
-	if sprite.animation == "hitting":
-		hitting = false
+	pass
 func _on_particle_animation_looped() -> void:
-	if particles.animation == "relation_up":
-		is_particling = false
+	pass
 func _on_area_2d_3_body_entered(body: Node2D) -> void:
 	if body != self:
 		is_jumpend_collide_possible = true
@@ -128,6 +138,13 @@ func _on_area_2d_3_body_exited(body: Node2D) -> void:
 			set_collision_shape_flags(0,true)
 			#active_collision_shape()
 
+func connect_signals():
+	moviment_timer.timeout.connect(call_sequence)
+	inventory.item_storaged.connect(update_statistic)
+	area_detect.body_entered.connect(DetectionComp.add_body_detected)
+	area_detect.body_exited.connect(DetectionComp.remove_body_detected)
+	range_attack.body_entered.connect(DetectionComp.add_body_on_range)
+	range_attack.body_exited.connect(DetectionComp.remove_body_on_range)
 func initStatus():
 	status = Status.create_status(type)
 	status.connect("statusIsZero",status_is_zero)
@@ -145,12 +162,9 @@ func set_animation(animation):
 	sprite.play("default")
 func set_shadow(shadow_texture):
 	shadow.texture = load("res://resources/entities/"+shadow_texture)
-func set_moviment_direction(dir:Vector2):
-	movimentDirection = dir
-func set_in_moviment():
-	inMoviment = 1
-func set_not_in_moviment():
-	inMoviment = 0
+
+
+
 func set_onself(flag:bool):
 	onSelf = flag
 func set_collision_shape_flags(z_idx:int, value:bool):
@@ -169,18 +183,9 @@ func set_position_on_world(x,y):
 
 func get_direction():
 	return raycast.target_position/range_action
-func get_position_on_eye():
-	return position + raycast.target_position
-func get_sequence():
-	var seq = []
-	for i in sequence_click.size():
-		if Movimentos.isMovimentExecution(sequence_click[i]):
-			seq.append(sequence_click[i])
-			return seq
-		seq.append(sequence_click[i])
-	return seq
+
 func get_target_on_range():
-	return raycast.get_collider()
+	return InteractionComp.get_target_on_range()
 func get_speed():
 	return characterSpeed
 func get_inventory_node():
@@ -193,9 +198,7 @@ func get_estatisticas_class():
 	return estatisticas
 func get_chunk_limits():
 	return chunk_limits
-func get_targets_nearby(): #maybe del
-	return bodys_on_detect
-	#return area_detect.get_overlapping_bodies()
+
 func get_area_detect():
 	return area_detect
 func get_habilitys():
@@ -219,30 +222,9 @@ func get_defense_amor_value(piece):
 
 func update_statistic(statistic_metric):
 	estatisticas.update_statistic(statistic_metric)
-func update_velocity():
-	self.velocity = (get_speed()*movimentDirection)*inMoviment
-func update_animation():
-	if hitting:
-		sprite.play("hitting")
-	elif hitted:
-		sprite.play("hitted")
-	elif is_in_jump:
-		pass
-	elif inMoviment == 1:
-		sprite.play("walk")
-	else:
-		sprite.play("default")
-func update_animation_particle():
-	if is_particling:
-		if not particles.is_visible_in_tree():
-			particles.show()
-		particles.play("relation_up")
-	else:
-		particles.stop()
-		particles.play("default")
-		particles.hide()
-func update_lifebar():
-	lifebar.size.x = 20.0*(StatusInterface.get_life_state(status.general_status))
+
+
+
 #
 #func update_entity():
 	#if regen_ativated:
@@ -250,18 +232,12 @@ func update_lifebar():
 			#regen_timer.start(10)
 			#regen_timer.connect("timeout",status.activeRegen)
 
-func update_shadow_position():
-	if is_in_jump:
-		shadow.offset = (position - nextPosition)*(-1) + Vector2(0,8)
-	else:
-		shadow.offset = Vector2(0,8)
-func update_character_speed():
-	pass
 
-func reset_character_speed():
-	characterSpeed = Vector2((50 if self.is_in_group(GameConfig.GROUP_ENTITY_PLAYER) else 40),50)
-func reset_character_speed_jump():
-	characterSpeed = Vector2((50 if self.is_in_group(GameConfig.GROUP_ENTITY_PLAYER) else 40),100)
+#func update_character_speed():
+	#pass
+#
+
+
 func reset_regen_timer():
 	regen_timer.start(10)
 
@@ -322,19 +298,7 @@ func has_stepped_out_chunk():
 func hasDefense():
 	return inventory.get_armor_defense().size() > 0
 
-func has_targeted():
-	var collider = get_target_on_range()
-	if !(collider == last_interactable or collider == null or collider == self):
-		if last_interactable != null:
-			if last_interactable.has_method("targeted_effect_deactive"):
-				last_interactable.targeted_effect_deactive()
-		#if collider.is_in_group(GameConfig.GROUP_INTERACTABLE):
-		if collider.has_method("targeted_effect_active"):
-			last_interactable = collider
-			collider.targeted_effect_active()
-	elif (collider == null and last_interactable != null):
-		last_interactable.targeted_effect_deactive()
-		last_interactable = null
+
 
 func has_status_to_use_hability(hab:Habilidade):
 	var hab_consum = hab.get_consum()
@@ -346,7 +310,7 @@ func has_status_to_use_hability(hab:Habilidade):
 func has_weapon_equiped():
 	return inventory.has_principal_item()
 
-func call_sequence(sequence=get_sequence()):
+func call_sequence(sequence=MPDComp.get_sequence()):
 	var moviment = Movimentos.get_moviment_sequence_result(sequence)
 	var skills_possibilitys = RMovimentos.findRelation(moviment)
 	var skill = habilidades.get_hability_with_req(self,skills_possibilitys)
@@ -362,7 +326,7 @@ func call_sequence(sequence=get_sequence()):
 		
 	apply_skill(skill)
 	moviment_timer.stop()
-	interuptSequence()
+	MPDComp.interuptSequence()
 
 func call_skill(skill:Habilidade,target):
 	if skill.type == Habilidades.PHYSIC_SKILL:
@@ -376,17 +340,7 @@ func call_magic(skill_name):
 	if habilidades.hasHabilidade(skill_name):
 		call_skill(habilidades.get_habilidade(skill_name),null)
 
-func add_body_detected(body):
-	bodys_on_detect.append(body)
 
-func add_body_on_range(body):
-	bodys_on_range_attack.append(body)
-
-func remove_body_detected(body):
-	bodys_on_detect.erase(body)
-
-func remove_body_on_range(body):
-	bodys_on_range_attack.erase(body)
 
 func apply_skill(skill):
 	if skill == null:
@@ -451,7 +405,7 @@ func learn_habilidade(hab_name):
 
 func hit():
 	hitted = true
-	set_not_in_moviment()
+	MovimentComp.set_not_in_moviment()
 	#update_entity()
 
 func lift():
@@ -473,75 +427,79 @@ func squat():
 			collision_body_shape.shape.radius = 4
 		elif collision_body_shape.shape is CircleShape2D:
 			collision_body_shape.shape.radius = 4
-func jump():
-	if not is_in_jump:
-		makeMoviment(Movimentos.MOVIMENTS.JUMP)
-		nextPosition = self.position
-		jump_origin = self.position
-		is_jumping_up = true
-		is_in_jump = true
-		set_collision_shape_flags(1,false)
-		#deactive_collision_shape()
+#func jump():
+	#if not is_in_jump:
+		#makeMoviment(Movimentos.MOVIMENTS.JUMP)
+		#nextPosition = self.position
+		#jump_origin = self.position
+		#is_jumping_up = true
+		#is_in_jump = true
+		#set_collision_shape_flags(1,false)
+		##deactive_collision_shape()
 
 func walk_to(target:Vector2):
 	if has_stepped_out_chunk() and !target.is_equal_approx(Vector2.ZERO):
 		GameConfig.change_obj_chunk(self)
-	var is_only_jump : bool = false
+	var is_only_jump : bool = JumpComp.is_only_jump(target)
 	var jump_dir : Vector2
 	var jump_heigth : Vector2 = Vector2(48,48) # jump_fall_distance , jump_heigth
-	if target.is_equal_approx(Vector2.ZERO) and is_in_jump:
-		is_only_jump = true
+	#
+	#if target.is_equal_approx(Vector2.ZERO) and is_in_jump:
+		#is_only_jump = true
 	
 	#Define a direção do pulo
-	if is_jumping_up:
-		jump_dir.y = -1
-	elif is_jumping_down:
-		jump_dir.y = 1
+	jump_dir.y = JumpComp.get_jump_dir()
+	#if is_jumping_up:
+		#jump_dir.y = -1
+	#elif is_jumping_down:
+		#jump_dir.y = 1
 	
 	#Define a direção que a entity tem que estar olhando
 	if not is_only_jump:
-		if not target.is_equal_approx(Vector2(0,0)):
-			look_to(target)
+		TargetingComp.set_look_on_target(target)
+		#if not target.is_equal_approx(Vector2(0,0)):
+			#look_to(target)
 	
 	#direciona a queda do pulo, ou próxima posição do personagem
 	if is_only_jump:
-		set_moviment_direction(jump_dir)
+		MovimentComp.set_moviment_direction(jump_dir)
 	elif is_in_jump:
 		var dir_to_next : Vector2 = target
 		dir_to_next.y = jump_dir.y
 		
-		if jump_origin.distance_to(nextPosition + target*0.8) < jump_heigth.x:
-			nextPosition = nextPosition + target*0.8
-			jump_heigth.y = 48 + (-1)*(jump_origin.y - nextPosition.y)
-		
-		set_moviment_direction(dir_to_next)
+		#if jump_origin.distance_to(nextPosition + target*0.8) < jump_heigth.x:
+			#nextPosition = nextPosition + target*0.8
+			#jump_heigth.y = 48 + (-1)*(jump_origin.y - nextPosition.y)
+		jump_heigth = JumpComp.calculate_jump_height(target)
+		MovimentComp.set_moviment_direction(dir_to_next)
 	else:
-		set_moviment_direction(target)
+		MovimentComp.set_moviment_direction(target)
 	
 	#Define se a entity está se movendo ou não
 	if target.is_equal_approx(Vector2.ZERO) and not is_in_jump:
-		set_not_in_moviment()
+		MovimentComp.set_not_in_moviment()
 	else:
-		set_in_moviment()
+		MovimentComp.set_in_moviment()
 	
 	#Define a velocidade para caso esteja pulando ou não
 	if is_in_jump:
-		reset_character_speed_jump()
+		JumpComp.reset_character_speed_jump()
 	else:
-		reset_character_speed()
+		MovimentComp.reset_character_speed()
 	#controla s flags do sistema de pulo
-	if is_jumping_up and nextPosition.y - self.position.y > jump_heigth.y:
-		is_jumping_up = false
-		is_jumping_down = true
-	elif is_jumping_down and nextPosition.y - self.position.y <= 0:
-		is_jumping_down = false
-		is_in_jump = false
-		if not is_jumpend_collide_possible:
-			set_collision_shape_flags(0,true)
-			#active_collision_shape()
+	JumpComp.update_jump_flags(jump_heigth)
+	#if is_jumping_up and nextPosition.y - self.position.y > jump_heigth.y:
+		#is_jumping_up = false
+		#is_jumping_down = true
+	#elif is_jumping_down and nextPosition.y - self.position.y <= 0:
+		#is_jumping_down = false
+		#is_in_jump = false
+		#if not is_jumpend_collide_possible:
+			#set_collision_shape_flags(0,true)
+			##active_collision_shape()
 	
 	#update_ ShadowPosition
-	update_shadow_position()
+	JumpComp.update_shadow_position()
 
 
 #func active_collision_shape():
@@ -598,25 +556,8 @@ func openInterface():
 	var struct = raycast.get_collider()
 	if struct != null:
 		pass
-func interuptSequence():
-	var size_sequence = sequence_click.size() 
-	for i in size_sequence:
-		if sequence_click.size() == 0:
-			return
-		if Movimentos.isMovimentExecution(sequence_click[0]):
-			sequence_click.pop_front()
-			continue
-		sequence_click.pop_front()
 func makeMoviment(moviment):
-	## Logica
-	#-> movimento realizado
-	#--> Verifica se já foram adicionados movimentos de mais, se verdade então reseta a sequencia e adiciona a pilha,
-	# caso contrário só adiciona na pilha
-	#--> A cada movimento inicia-se um timer para que seja executado o movimento
-	if sequence_click.size() + 1 > 3:
-		interuptSequence()
-	moviment_timer.start(0.4)
-	sequence_click.append(moviment)
+	MPDComp.makeMoviment(moviment)
 
 func status_is_zero(sts):
 	match sts:
@@ -635,7 +576,7 @@ func status_loss(sts):
 
 func status_change(sts):
 	if sts == StatusInterface.STATUS.VIDA:
-		update_lifebar()
+		HealthBarComp.update_lifebar()
 
 func status_is_full(sts):
 	stopRegen(sts)
